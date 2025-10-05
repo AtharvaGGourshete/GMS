@@ -7,22 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import api from '@/api/axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function RegisterForm() {
     const navigate = useNavigate();
-    
-    // 1. Define your form (React Hook Form)
-    // 🚨 UPDATED: Added 'phone' and changed 'name' to 'full_name'
     const form = useForm({
         defaultValues: { full_name: '', email: '', password: '', confirmPassword: '', phone: '' },
     });
-    
-    // Helper to extract state
     const { isSubmitting } = form.formState;
-
-    // 2. Define the submit handler
     const onSubmit = async (values) => {
-        // Client-side validation for password match
         if (values.password !== values.confirmPassword) {
             form.setError('confirmPassword', {
                 type: 'manual',
@@ -32,26 +25,21 @@ export default function RegisterForm() {
         }
 
         try {
-            // 3. Make the API call to the backend registration endpoint
-            // 🚨 UPDATED: Data payload uses 'full_name' and 'phone'
             const dataToSend = {
                 full_name: values.full_name,
                 email: values.email,
-                password: values.password, // Sent as plain text, backend hashes to password_hash
-                phone: values.phone || null, // Ensure phone is sent, or null if empty
+                password: values.password, 
+                phone: values.phone || null, 
             };
 
             const response = await api.post('/auth/register', dataToSend);
             
             console.log("Registration successful:", response.data.message);
-            
-            // 4. Redirect the user to the login page after successful registration
+            toast("Registration successful")
             navigate('/login'); 
         } catch (error) {
             const errorMessage = error.response?.data?.message || "Registration failed. Please try again.";
             console.error("Registration failed:", errorMessage);
-            
-            // Display the error (e.g., if email already exists)
             form.setError('email', { message: errorMessage });
         }
     };
