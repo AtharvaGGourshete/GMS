@@ -1,17 +1,31 @@
-import LandingPage from "./pages/LandingPage";
-import { createBrowserRouter, RouterProvider } from "react-router";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <LandingPage />,
-    errorElement: <div>Error loading the app</div>,
-  },
-])
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import LandingPage from './pages/LandingPage';
+import Login from './pages/Login';
+import Resgister from './pages/Resgister';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 function App() {
   return (
-    <RouterProvider router={router} />
+    <AuthProvider>
+            <Router>
+              <Navbar/>
+                <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Resgister />} />
+                    
+                    <Route element={<ProtectedRoute />}>
+                        {/* <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/memberships" element={<div>Memberships Page</div>} /> */}
+                    </Route>
+                </Routes>
+                <Footer/>
+            </Router>
+        </AuthProvider>
   );
 }
 
