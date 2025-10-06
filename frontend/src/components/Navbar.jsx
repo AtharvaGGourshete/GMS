@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { User } from "lucide-react";
 
 const Navbar = () => {
+  const {isLoading, setIsLoading} = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 

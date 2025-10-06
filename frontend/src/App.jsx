@@ -7,6 +7,7 @@ import Resgister from './pages/Resgister';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Profile from './pages/Profile';
+import Trainers from './pages/Trainers';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Resgister />} />
+                    <Route path="/trainers" element={<Trainers />} />
                     
                     <Route element={<ProtectedRoute />}>
                         {/* <Route path="/dashboard" element={<Dashboard />} />

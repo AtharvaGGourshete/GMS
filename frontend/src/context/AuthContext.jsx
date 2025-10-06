@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { toast } from "sonner";
 
 const AuthContext = createContext();
 
@@ -33,6 +34,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
     setUser(null);
+    toast("Logout successful")
   };
 
   return (
