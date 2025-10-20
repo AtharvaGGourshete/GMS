@@ -13,7 +13,7 @@ import { Mail, Phone, CalendarDays, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-const Profile = () => {
+const MemberProfile = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -103,4 +103,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default MemberProfile;
