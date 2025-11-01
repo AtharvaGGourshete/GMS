@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import api from '@/api/axios';
+import api from '@/axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -15,6 +15,7 @@ export default function RegisterForm() {
         defaultValues: { full_name: '', email: '', password: '', confirmPassword: '', phone: '' },
     });
     const { isSubmitting } = form.formState;
+    
     const onSubmit = async (values) => {
         if (values.password !== values.confirmPassword) {
             form.setError('confirmPassword', {
@@ -52,10 +53,9 @@ export default function RegisterForm() {
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             
-                            {/* 🚨 Full Name Field (Required) */}
                             <FormField
                                 control={form.control}
-                                name="full_name" // <-- Corrected name
+                                name="full_name" 
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Full Name</FormLabel>
@@ -67,7 +67,6 @@ export default function RegisterForm() {
                                 )}
                             />
 
-                            {/* Email Field (Required) */}
                             <FormField
                                 control={form.control}
                                 name="email"
@@ -81,11 +80,9 @@ export default function RegisterForm() {
                                     </FormItem>
                                 )}
                             />
-                            
-                            {/* 🚨 Phone Field (Optional) */}
                             <FormField
                                 control={form.control}
-                                name="phone" // <-- Added phone field
+                                name="phone" 
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Phone (Optional)</FormLabel>
@@ -97,7 +94,6 @@ export default function RegisterForm() {
                                 )}
                             />
 
-                            {/* Password Field (Required) */}
                             <FormField
                                 control={form.control}
                                 name="password"
@@ -112,7 +108,6 @@ export default function RegisterForm() {
                                 )}
                             />
 
-                            {/* Confirm Password Field (Required for match) */}
                             <FormField
                                 control={form.control}
                                 name="confirmPassword"

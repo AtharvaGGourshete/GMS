@@ -17,10 +17,10 @@ const PORT = process.env.PORT || 5000
 app.use(cors())
 app.use(express.json())
 
-app.post("/api/users/register", register)
-app.post("/api/users/login", login)
+app.post("/api/auth/register", register)
+app.post("/api/auth/login", login)
 
-app.use("/api/users", userRoutes)
+app.use("/api/user", userRoutes)
 app.use("/api/membership", membershipRoutes)
 app.use("/api/attendance", attendanceRoutes)
 app.use("/api/trainers", trainerRoutes);

@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import api from "@/api/axios";
+import api from "@/axios";
 import { useAuth } from "../../context/AuthContext";
 import {
   Card,
@@ -16,14 +16,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const ErrorMessage = ({ errors, name }) => {
-  return errors[name] ? (
-    <p className="text-sm font-medium text-destructive mt-1">
-      {errors[name].message}
-    </p>
+const ErrorMessage = ({ errors, name }) =>
+  errors[name] ? (
+    <p className="text-sm font-medium text-destructive mt-1">{errors[name].message}</p>
   ) : null;
-};
-
 
 export default function Login() {
   const { register, handleSubmit, formState: { errors }, setError } = useForm();
@@ -31,7 +27,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
-    setError("email", { message: null }); 
+    setError("email", { message: null });
     setError("password", { message: null });
 
     try {
@@ -40,28 +36,35 @@ export default function Login() {
         password: values.password,
       });
 
-      login(response.data.user, response.data.token);
-      toast("You have been logged in")
-      navigate("/"); 
+      const { user, token } = response.data;
+      login(user, token);
+      toast.success("Logged in successfully!");
+
+      // Role-based redirection
+      switch (user.role) {
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
+        case "trainer":
+          navigate("/trainer/dashboard");
+          break;
+        case "member":
+        default:
+          navigate("/member/dashboard");
+      }
     } catch (error) {
-      console.error("Login error:", error.response?.data || error.message);
-      toast("Error while submitting the form")
-      const errorMessage = error.response?.data?.message || "Login failed. Please try again.";      
-      setError("email", { 
-        type: "server",
-        message: errorMessage 
-      });
+      console.error(error);
+      toast.error(error.response?.data?.message || "Login failed");
+      setError("email", { type: "server", message: error.response?.data?.message });
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen p-4">
-      <Card className="w-full max-w-sm  mb-20">
+    <div className="flex justify-center items-center min-h-screen p-4 bg-gray-50">
+      <Card className="w-full max-w-sm mb-20 shadow-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your credentials to access your account.
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold">Login</CardTitle>
+          <CardDescription>Enter your credentials to access your account.</CardDescription>
         </CardHeader>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -77,7 +80,6 @@ export default function Login() {
               <ErrorMessage errors={errors} name="email" />
             </div>
 
-            {/* Password Field */}
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -89,7 +91,7 @@ export default function Login() {
               <ErrorMessage errors={errors} name="password" />
             </div>
           </CardContent>
-          
+
           <CardFooter>
             <Button type="submit" className="w-full mt-4 cursor-pointer">
               Login

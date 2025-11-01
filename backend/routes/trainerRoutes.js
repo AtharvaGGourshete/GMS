@@ -6,11 +6,11 @@ const {
   updateTrainer,
   deleteTrainer,
 } = require("../controllers/trainerController");
-const {verifyJWT} = require("../controllers/authController")
+const {verifyJWT, verifyRole} = require("../controllers/authController")
 
 const router = express.Router();
 
-router.post("/", verifyJWT, createTrainer);
+router.post("/", verifyJWT,verifyRole(["admin"]), createTrainer);
 router.get("/", verifyJWT, getAllTrainers);
 router.get("/:id", verifyJWT, getTrainerById);
 router.put("/:id", verifyJWT, updateTrainer);

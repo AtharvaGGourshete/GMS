@@ -1,41 +1,68 @@
 import { Github, Instagram, Linkedin } from "lucide-react";
 import React from "react";
+import { Link } from "react-router-dom"; // Assuming react-router-dom for navigation
 
 const Footer = () => {
   return (
-    <footer className="h-72 bg-[#131313] text-white">
-      <div className="grid grid-cols-2 text-[#F24423] items-center justify-center text-center">
-        <div className="text-2xl font-extrabold mt-10 ml-72">
-          <img
-            src="main-bg.png"
-            width={100}
-            height={100}
-            className="rounded-full"
-          />
+    <footer className="bg-[#131313] text-white py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Top Section: Logo and Links */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 text-center md:text-left border-b border-gray-700 pb-8 mb-8">
+
+          {/* Logo/Branding */}
+          <div className="flex justify-center md:justify-start items-center md:col-span-2">
+            <Link to="/">
+              <div className="flex items-center">
+                <img
+                  src="main-bg.png" // Assuming this is the correct path to the logo
+                  alt="Gymie Logo"
+                  width={80}
+                  height={80}
+                  className="rounded-full h-20 w-20 object-cover"
+                />
+                <span className="text-4xl font-extrabold ml-3 text-[#F24423]">Gymie</span>
+              </div>
+            </Link>
+          </div>
+
+          {/* Quick Links */}
+          <div className="mt-4 md:mt-0">
+            <h3 className="text-xl font-bold mb-4 text-[#F24423]">Quick Links</h3>
+            <ul className="font-light text-base text-gray-300 space-y-2">
+              <li><Link to="/" className="hover:text-[#F24423] transition-colors duration-300">Home</Link></li>
+              <li><Link to="/memberships" className="hover:text-[#F24423] transition-colors duration-300">Memberships</Link></li>
+              <li><Link to="/trainers" className="hover:text-[#F24423] transition-colors duration-300">Trainers</Link></li>
+              <li><Link to="/about" className="hover:text-[#F24423] transition-colors duration-300">About Us</Link></li>
+            </ul>
+          </div>
+          
+          {/* Contact Info / Newsletter (Added a dummy section for better layout) */}
+          <div className="mt-4 md:mt-0">
+            <h3 className="text-xl font-bold mb-4 text-[#F24423]">Get in Touch</h3>
+            <p className="text-sm text-gray-300 mb-2">123 Gym Street, Fitness City, 90210</p>
+            <p className="text-sm text-gray-300">support@gymie.com</p>
+          </div>
+
         </div>
-        <div className="text-2xl font-extrabold  mt-10">
-          <div>Quick Links</div>
-          <ul className="font-light text-sm text-white">
-            <li className=" hover:underline">Home</li>
-            <li className=" hover:underline">Memberships</li>
-            <li className=" hover:underline">Trainers</li>
-            <li className=" hover:underline">About Us</li>
-          </ul>
+
+        {/* Bottom Section: Copyright and Social Media */}
+        <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left mt-8">
+          
+          {/* Copyright/Terms */}
+          <div className="text-sm text-gray-400 order-2 sm:order-1 mt-4 sm:mt-0">
+            &copy; {new Date().getFullYear()} Gymie Inc. All rights reserved. | Terms and conditions applied
+          </div>
+
+          {/* Social Media Links */}
+          <div className="order-1 sm:order-2">
+            <div className="flex justify-center sm:justify-end gap-5 text-gray-400">
+              <a href="#" aria-label="Github" className="hover:text-[#F24423] transition-colors duration-300"><Github/></a>
+              <a href="#" aria-label="Linkedin" className="hover:text-[#F24423] transition-colors duration-300"><Linkedin/></a>
+              <a href="#" aria-label="Instagram" className="hover:text-[#F24423] transition-colors duration-300"><Instagram/></a>
+            </div>
+          </div>
         </div>
-        {/* <div className="text-2xl font-extrabold">Features</div> */}
-        
       </div>
-      <hr className="mt-10 w-[1350px] mx-auto"/>
-    <div className="grid grid-cols-2 text-white text-center mt-5">
-      <div className="text-gray-400">Terms and conditions applied</div>
-      <div className="text-gray-400">
-        <div className="flex justify-center gap-5 text-gray-400 cursor-pointer">
-          <p><Github/></p>
-          <p><Linkedin/></p>
-          <p><Instagram/></p>
-        </div>
-      </div>
-    </div>
     </footer>
   );
 };

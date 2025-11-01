@@ -8,6 +8,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MemberProfile from './pages/member/MemberProfile';
 import Trainers from './pages/trainer/Trainers';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import TrainerDashboard from './pages/trainer/TrainerDashboard';
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
                         {/* <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/memberships" element={<div>Memberships Page</div>} /> */}
                         <Route path='/profile' element={<MemberProfile/>}/>
+                        <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
+                        <Route path='/trainer/dashboard' element={<TrainerDashboard/>}/>
                     </Route>
                 </Routes>
                 <Footer/>

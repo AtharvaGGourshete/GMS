@@ -1,6 +1,5 @@
 const db = require("../config/db");
 
-// ✅ Create a new trainer (linked to user)
 exports.createTrainer = (req, res) => {
   const { specialization, certifications } = req.body;
 
@@ -8,10 +7,8 @@ exports.createTrainer = (req, res) => {
     return res.status(400).json({ message: "Specialization is required" });
   }
 
-  // req.user is set by verifyJWT middleware
   const user_id = req.user.id;
 
-  // Check if user is already a trainer
   db.query("SELECT id FROM trainers WHERE user_id = ?", [user_id], (err, result) => {
     if (err) {
       console.error(err);
@@ -41,7 +38,6 @@ exports.createTrainer = (req, res) => {
   });
 };
 
-// ✅ Get all trainers (with user details)
 exports.getAllTrainers = (req, res) => {
   const query = `
     SELECT t.id, u.full_name, u.email, t.specialization, t.certifications
@@ -60,7 +56,6 @@ exports.getAllTrainers = (req, res) => {
   });
 };
 
-// ✅ Get trainer by ID
 exports.getTrainerById = (req, res) => {
   const { id } = req.params;
 
@@ -85,7 +80,6 @@ exports.getTrainerById = (req, res) => {
   });
 };
 
-// ✅ Update trainer
 exports.updateTrainer = (req, res) => {
   const { specialization, certifications } = req.body;
   const { id } = req.params;
@@ -114,7 +108,6 @@ exports.updateTrainer = (req, res) => {
   });
 };
 
-// ✅ Delete trainer
 exports.deleteTrainer = (req, res) => {
   const { id } = req.params;
 
