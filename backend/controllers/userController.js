@@ -1,7 +1,7 @@
 const db = require("../config/db");
 
 const getAllUsers = (req, res) => {
-  const query = `SELECT id, full_name, phone FROM users;`;
+  const query = `SELECT id, full_name, email, phone, created_at FROM users WHERE role_id = 3;`;
   db.query(query, (err, results) => {
     if (err) {
       return res.status(500).json({ message: "Database Error", error: err });

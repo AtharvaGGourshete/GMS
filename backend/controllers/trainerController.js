@@ -43,6 +43,7 @@ exports.getAllTrainers = (req, res) => {
     SELECT t.id, u.full_name, u.email, t.specialization, t.certifications
     FROM trainers t
     JOIN users u ON t.user_id = u.id
+    WHERE role_id = 2
     ORDER BY t.created_at DESC
   `;
 

@@ -10,6 +10,7 @@ import MemberProfile from './pages/member/MemberProfile';
 import Trainers from './pages/trainer/Trainers';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import TrainerDashboard from './pages/trainer/TrainerDashboard';
+import AdminMembers from './pages/admin/AdminMembers';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
                         <Route path="/memberships" element={<div>Memberships Page</div>} /> */}
                         <Route path='/profile' element={<MemberProfile/>}/>
                         <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
+                        <Route path='/admin/members' element={<AdminMembers/>}/>
                         <Route path='/trainer/dashboard' element={<TrainerDashboard/>}/>
                     </Route>
                 </Routes>

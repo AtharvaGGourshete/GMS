@@ -8,9 +8,9 @@ const {
   getUserAttendance,
 } = require("../controllers/userController");
 
-const { verifyJWT } = require("../controllers/authController");
+const { verifyJWT, verifyRole } = require("../controllers/authController");
 
-router.get("/", verifyJWT, getAllUsers)
+router.get("/", verifyJWT,verifyRole(["admin"]), getAllUsers)
 router.get("/:id", verifyJWT, getUserById)
 router.put("/:id". verifyJWT, updateUser)
 router.delete("/:id", verifyJWT, deleteUser)
