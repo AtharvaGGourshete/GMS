@@ -40,7 +40,7 @@ const Navbar = () => {
       )}
 
       {/* Standard Links */}
-      <Link to="/memberships" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>Memberships</Link>
+      <Link to="/membership-plans" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>Memberships</Link>
       <Link to="/trainers" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>Trainers</Link>
       <Link to="/about" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>About Us</Link>
     </>
@@ -53,8 +53,8 @@ const Navbar = () => {
         <Link to="/">
           <div className="flex items-center font-extrabold text-2xl sm:text-3xl font-mono text-[#F24423]">
             {/* Note: Updated image tag to include alt attribute for accessibility */}
-            <img src="main-bg.png" width={40} height={40} className="-mr-1 sm:-mr-2" alt="Gymie Logo"/>
-            <span className="text-black text-3xl sm:text-4xl">ymie</span>
+            {/* <img src="main-bg.png" width={40} height={40} className="-mr-1 sm:-mr-2" alt="Gymie Logo"/> */}
+            <span className="text-black text-3xl sm:text-4xl">Gymie</span>
           </div>
         </Link>
 

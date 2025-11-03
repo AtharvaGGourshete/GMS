@@ -47,50 +47,99 @@ const getMembershipById = (req, res) => {
 
 const createMemberShip = async (req,res) => {
     try {
-        const {full_name, email, phone, plan_id, join_date, expiry_date} = req.body;
-        if(!full_name || !email || !plan_id){
-            res.status(400).jsonb({
-                message: "Full name, Email and Plan are required"
+        // 👈 CRITICAL CHANGE: Accept user_id from the request body
+        const {user_id, full_name, email, phone, plan_id, join_date, expiry_date} = req.body; 
+        
+        // Validate required fields for membership creation
+        if(!user_id || !full_name || !email || !plan_id || !join_date || !expiry_date){
+            return res.status(400).json({
+                message: "User ID, Full name, Email, Plan ID, Join Date, and Expiry Date are required for membership creation."
             })
         }
 
-        const query = `INSERT INTO members (full_name, email, phone, plan_id, join_date, expiry_date) VALUES (?,?,?,?,?,?)`
+        // NOTE: The 'members' table structure is assumed to map the fields provided in the query.
+        const query = `INSERT INTO members (user_id, full_name, email, phone, plan_id, join_date, expiry_date) VALUES (?,?,?,?,?,?,?)`
 
-        db.query(query,[full_name, email, phone || null , plan_id, join_date || null, expiry_date||null], (error, results) => {
+        db.query(query,[user_id, full_name, email, phone || null , plan_id, join_date, expiry_date], (error, results) => {
             if (error){
-                res.status(500).json({message: "Database error", error: error})
+                console.error("Membership DB Error:", error);
+                return res.status(500).json({message: "Database error during membership creation", error: error})
             }
 
             res.status(200).json({
                 message: "Membership created successfully",
-                membershipId: results.id
+                membershipId: results.insertId
             })
         })
     } catch (error) {
         console.error("Error while creating membership: ",error)
-        res.status(500).json({message: "Error while adding the user"})
+        res.status(500).json({message: "Error while adding the user's membership"})
     }
 }
 
-const updateMemberShip = async (req,res) => {
-    try {
-        const query = `UPDATE members SET full_name = ? , email = ?, phone = ?, plan_id = ?, join_date = ?, end_date = ? WHERE id = ?;`
+const updateMembershipByUserId = (req, res) => {
+    const { userId } = req.params; // The user ID comes from the URL
+    const { plan_id } = req.body; // The new plan ID comes from the request body
 
-        db.query(query,[full_name, email, phone, plan_id, start_date, end_date, id], (error, results) => {
-            if (error){
-                res.status(500).json({message: "Database error", error: error})
-            }
-
-            if (results.affectedRows === 0){
-                return res.status(400).json({message: "Membership not found"})
-            }
-
-            res.status(200).json({message: "Membership updated successfully"})
-        })
-    } catch (error) {
-        console.error("Error while updating the membership details", error)
+    if (!plan_id) {
+        return res.status(400).json({ message: "Plan ID is required for membership update." });
     }
-}
+
+    // 1. Fetch the selected plan's duration (needed to calculate new expiry date)
+    const fetchPlanQuery = `SELECT duration_days FROM plans WHERE id = ?`;
+
+    db.query(fetchPlanQuery, [plan_id], (err, planResults) => {
+        if (err || planResults.length === 0) {
+            console.error("Error fetching plan duration:", err);
+            return res.status(404).json({ message: "Selected plan not found or database error." });
+        }
+
+        const durationDays = planResults[0].duration_days;
+        const joinDate = new Date().toISOString().split('T')[0]; // Today's date
+        
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + parseInt(durationDays, 10));
+        const newExpiryDate = expiryDate.toISOString().split('T')[0];
+        
+        // 2. Update the existing membership record for this user
+        // NOTE: This assumes a user has AT MOST one current membership record in the 'members' table.
+        const updateQuery = `
+            UPDATE members 
+            SET 
+                plan_id = ?,
+                join_date = ?,
+                expiry_date = ?,
+                status = 'active'
+            WHERE user_id = ?
+            ORDER BY created_at DESC 
+            LIMIT 1
+        `;
+
+        db.query(updateQuery, [plan_id, joinDate, newExpiryDate, userId], (err, updateResults) => {
+            if (err) {
+                console.error("Error updating membership:", err);
+                return res.status(500).json({ message: "Database error during membership update." });
+            }
+
+            if (updateResults.affectedRows === 0) {
+                // If no existing membership was found, create a new one instead of failing the update.
+                const insertQuery = `
+                    INSERT INTO members (user_id, plan_id, join_date, expiry_date, status)
+                    VALUES (?, ?, ?, ?, 'active')
+                `;
+                db.query(insertQuery, [userId, plan_id, joinDate, newExpiryDate], (insertErr) => {
+                    if (insertErr) {
+                         console.error("Error creating new membership:", insertErr);
+                        return res.status(500).json({ message: "Membership not found, and failed to create new one." });
+                    }
+                     return res.status(200).json({ message: "New membership created successfully." });
+                });
+            } else {
+                 res.status(200).json({ message: "Membership plan updated successfully." });
+            }
+        });
+    });
+};
 
 const deleteMemberShip = async (req,res) => {
     const {id} = req.params;
@@ -114,6 +163,6 @@ module.exports = {
     getAllMemberships,
     getMembershipById,
     createMemberShip,
-    updateMemberShip,
+    updateMembershipByUserId,
     deleteMemberShip
 }

@@ -11,6 +11,7 @@ import Trainers from './pages/trainer/Trainers';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import TrainerDashboard from './pages/trainer/TrainerDashboard';
 import AdminMembers from './pages/admin/AdminMembers';
+import MembershipDisplay from './pages/public_pages/MembershipDisplay';
 
 function App() {
   return (
@@ -23,13 +24,14 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Resgister />} />
                     <Route path="/trainers" element={<Trainers />} />
-                    
+                    <Route path="/membership-plans" element={<MembershipDisplay />} />
                     <Route element={<ProtectedRoute />}>
                         {/* <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/memberships" element={<div>Memberships Page</div>} /> */}
                         <Route path='/profile' element={<MemberProfile/>}/>
                         <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
                         <Route path='/admin/members' element={<AdminMembers/>}/>
+                        <Route path="/admin/trainers" element={<Trainers />} />
                         <Route path='/trainer/dashboard' element={<TrainerDashboard/>}/>
                     </Route>
                 </Routes>

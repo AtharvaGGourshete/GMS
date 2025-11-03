@@ -6,16 +6,16 @@ const {
     getAllMemberships,
     getMembershipById,
     createMemberShip,
-    updateMemberShip,
+    updateMembershipByUserId,
     deleteMemberShip
 } = require("../controllers/membershipController")
 
-const {verifyJWT} = require("../controllers/authController")
+const {verifyJWT, verifyRole} = require("../controllers/authController")
 
 router.get("/",verifyJWT, getAllMemberships)
 router.get("/:id",verifyJWT, getMembershipById)
-router.post("/",verifyJWT, createMemberShip)
-router.put("/:id",verifyJWT, updateMemberShip)
+router.put("/:userId/plan", verifyJWT, verifyRole(["admin"]), updateMembershipByUserId); // 💡 New Route
+router.post("/", verifyJWT, verifyRole(["admin"]), createMemberShip);
 router.delete("/:id",verifyJWT, deleteMemberShip)
 
 module.exports = router

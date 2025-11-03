@@ -7,6 +7,8 @@ const membershipRoutes = require("./routes/membershipRoutes")
 const attendanceRoutes = require("./routes/attendanceRoutes")
 const trainerRoutes = require("./routes/trainerRoutes");
 const classRoutes = require("./routes/classRoutes");
+// 👈 Import new plans route
+const planRoutes = require("./routes/planRoutes"); 
 
 dotenv.config()
 require("./config/db")
@@ -25,6 +27,8 @@ app.use("/api/membership", membershipRoutes)
 app.use("/api/attendance", attendanceRoutes)
 app.use("/api/trainers", trainerRoutes);
 app.use("/api/classes", classRoutes);
+// 👈 Register new plans route
+app.use("/api/plans", planRoutes); 
 
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found", path: req.originalUrl });
