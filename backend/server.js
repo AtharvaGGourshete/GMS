@@ -26,8 +26,8 @@ app.use("/api/user", userRoutes)
 app.use("/api/membership", membershipRoutes)
 app.use("/api/attendance", attendanceRoutes)
 app.use("/api/trainers", trainerRoutes);
+app.use("/api/admin/trainers", trainerRoutes);
 app.use("/api/classes", classRoutes);
-// 👈 Register new plans route
 app.use("/api/plans", planRoutes); 
 
 app.use((req, res) => {

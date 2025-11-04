@@ -41,7 +41,7 @@ const Navbar = () => {
 
       {/* Standard Links */}
       <Link to="/membership-plans" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>Memberships</Link>
-      <Link to="/trainers" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>Trainers</Link>
+      {/* <Link to="/trainers" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>Trainers</Link> */}
       <Link to="/about" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>About Us</Link>
     </>
   );

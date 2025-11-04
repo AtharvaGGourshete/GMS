@@ -29,6 +29,7 @@ import {
   UserPlus,
   Search,
   Home,
+  User,
 } from "lucide-react";
 
 import {
@@ -44,7 +45,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const BRAND_COLOR = "#F24423";
-const ACCENT_COLOR_B = "#000000"; // Used for Neobrutalist styling
+const ACCENT_COLOR_B = "#000000"; // Black for Neobrutalist styling
 
 // --- Custom Hook for Window Dimensions ---
 const useWindowDimensions = () => {
@@ -71,11 +72,11 @@ const useWindowDimensions = () => {
 // --- Link Class Generator ---
 const getLinkClass = (path, currentPath) => {
   const isActive = currentPath === path;
-  return `flex items-center p-3 rounded-lg text-base font-medium transition-colors duration-150 group 
+  return `flex items-center p-3 text-base font-medium transition-colors duration-150 group border-2 border-transparent 
           ${
             isActive
-              ? `bg-[${BRAND_COLOR}] text-white shadow-md`
-              : "text-gray-700 hover:bg-gray-100"
+              ? `bg-[${BRAND_COLOR}] text-white shadow-md border-black`
+              : "text-gray-700 hover:bg-gray-100 hover:text-black"
           }`;
 };
 
@@ -89,6 +90,25 @@ const getMobileLinkClass = (path, currentPath) => {
               : "text-gray-500 hover:text-gray-700"
           }`;
 };
+
+// --- Neobrutalist Input Component (Shared) ---
+const NeobrutalistInput = ({ placeholder, ...props }) => (
+    <div 
+      className="relative w-full"
+      style={{
+        border: `2px solid ${ACCENT_COLOR_B}`,
+        boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
+        backgroundColor: 'white',
+      }}
+    >
+      <Input
+        placeholder={placeholder}
+        className="w-full h-10 px-3 py-2 border-0 focus:ring-0 focus:border-0 appearance-none bg-transparent"
+        style={{ border: 'none' }}
+        {...props}
+      />
+    </div>
+);
 
 // --- AdminMembers Component ---
 const AdminMembers = () => {
@@ -277,6 +297,7 @@ const AdminMembers = () => {
           successMessage = "Member details and **Membership Plan updated successfully!**";
         } else if (editMember.current_plan_id && !editMember.plan_id) {
             // Plan was removed from selection (plan_id is null/empty)
+            // Note: In a real app, you might want a specific endpoint to end/cancel membership
             toast.warning("Member details updated. Plan was set to 'None'. The old membership status remains unchanged.");
         }
       }
@@ -296,7 +317,7 @@ const AdminMembers = () => {
       .includes(searchTerm.toLowerCase())
   );
 
-  // --- Sidebar/Nav definitions remain unchanged ---
+  // --- Sidebar/Nav definitions ---
   const DesktopSidebar = (
     <aside className="hidden md:block w-64 text-gray-800 shadow-2xl p-4 bg-white border-r sticky top-0 h-screen">
       <div className="flex items-center justify-center h-16 border-b mb-6">
@@ -397,119 +418,171 @@ const AdminMembers = () => {
       {DesktopSidebar}
 
       <main className="flex-1 p-4 md:p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">
-          Member Management
-        </h1>
+        
+        {/* Header and Controls (Neobrutalist Style) */}
+        <div className="flex justify-between items-center mb-6 border-b-4 border-black pb-4">
+          <h1 className="text-3xl font-extrabold uppercase tracking-tight text-black">
+            Member Roster ({filteredMembers.length})
+          </h1>
 
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-          <div className="relative w-full md:w-1/3">
-            <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-            <Input
-              type="text"
-              placeholder="Search members by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex gap-4 items-center">
+            
+            {/* Search Input (Neobrutalist Style) */}
+            <div 
+                className="relative hidden md:block"
+                style={{
+                    border: `2px solid ${ACCENT_COLOR_B}`,
+                    boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
+                    backgroundColor: 'white',
+                }}
+            >
+                <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
+                <Input
+                  placeholder="Search members..."
+                  className="pl-8 border-0 focus:ring-0 focus:border-0 appearance-none bg-transparent"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ border: 'none' }}
+                />
+            </div>
+
+            {/* ADD MEMBER DIALOG */}
+            <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button 
+                    className="text-white font-bold uppercase transition-all duration-200"
+                    style={{
+                        backgroundColor: BRAND_COLOR,
+                        border: `2px solid ${ACCENT_COLOR_B}`,
+                        boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
+                    }}
+                >
+                  <UserPlus className="w-4 h-4 mr-2" /> Add Member
+                </Button>
+              </AlertDialogTrigger>
+
+              <AlertDialogContent 
+                className="border-4 border-black bg-white" 
+                style={{ boxShadow: `8px 8px 0 0 ${BRAND_COLOR}` }}
+              >
+                <AlertDialogHeader className="border-b-2 border-black pb-3 mb-2">
+                  <AlertDialogTitle className="text-2xl font-extrabold text-black">Add a New Member</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Fill in the details below to register a new member.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+
+                <div className="grid gap-3 py-3">
+                    <NeobrutalistInput
+                        placeholder="Full Name (Required)"
+                        value={newMember.full_name}
+                        onChange={(e) =>
+                            setNewMember({ ...newMember, full_name: e.target.value })
+                        }
+                    />
+                    <NeobrutalistInput
+                        type="email"
+                        placeholder="Email (Required)"
+                        value={newMember.email}
+                        onChange={(e) =>
+                            setNewMember({ ...newMember, email: e.target.value })
+                        }
+                    />
+                    <NeobrutalistInput
+                        placeholder="Phone"
+                        value={newMember.phone}
+                        onChange={(e) =>
+                            setNewMember({ ...newMember, phone: e.target.value })
+                        }
+                    />
+                    <NeobrutalistInput
+                        type="password"
+                        placeholder="Password (Required)"
+                        value={newMember.password}
+                        onChange={(e) =>
+                            setNewMember({ ...newMember, password: e.target.value })
+                        }
+                    />
+                    {/* Neobrutalist Plan Dropdown for Add Member */}
+                    <div 
+                        className="relative"
+                        style={{
+                            border: `2px solid ${ACCENT_COLOR_B}`,
+                            boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
+                            backgroundColor: 'white',
+                        }}
+                    >
+                        <select
+                            value={newMember.plan_id}
+                            onChange={(e) =>
+                                setNewMember({ ...newMember, plan_id: e.target.value })
+                            }
+                            className="
+                                h-10 w-full px-3 py-2 
+                                bg-white text-gray-700 
+                                border-0 
+                                focus:ring-0 focus:border-0 
+                                appearance-none 
+                                cursor-pointer
+                            "
+                            style={{ border: 'none' }}
+                        >
+                            <option value="">Select Plan (Optional)</option>
+                            {plans.map((plan) => (
+                                <option key={plan.id} value={plan.id}>
+                                    {plan.name} - {plan.duration_days} days - ₹{plan.price}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <AlertDialogFooter className="pt-4 border-t-2 border-black">
+                  <AlertDialogCancel 
+                    className="border-2 border-black font-bold"
+                    style={{ boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}` }}
+                  >
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={createUser}
+                    className="text-white font-bold uppercase"
+                    style={{
+                        backgroundColor: BRAND_COLOR,
+                        border: `2px solid ${ACCENT_COLOR_B}`,
+                        boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
+                    }}
+                  >
+                    Create Member
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
-
-          {/* ADD MEMBER DIALOG */}
-          <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <AlertDialogTrigger asChild>
-              <Button className={`bg-[${BRAND_COLOR}] hover:opacity-90 text-white w-full md:w-auto`}>
-                <UserPlus className="w-4 h-4 mr-2" />
-                Add Member
-              </Button>
-            </AlertDialogTrigger>
-
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Add a New Member</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Fill in the details below to create a new member.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-
-              <div className="grid gap-4 py-4">
-                <Input
-                  placeholder="Full Name"
-                  value={newMember.full_name}
-                  onChange={(e) =>
-                    setNewMember({ ...newMember, full_name: e.target.value })
-                  }
-                />
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={newMember.email}
-                  onChange={(e) =>
-                    setNewMember({ ...newMember, email: e.target.value })
-                  }
-                />
-                <Input
-                  placeholder="Phone"
-                  value={newMember.phone}
-                  onChange={(e) =>
-                    setNewMember({ ...newMember, phone: e.target.value })
-                  }
-                />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={newMember.password}
-                  onChange={(e) =>
-                    setNewMember({ ...newMember, password: e.target.value })
-                  }
-                />
-                {/* Standard Plan Dropdown for Add Member */}
-                <select
-                  value={newMember.plan_id}
-                  onChange={(e) =>
-                    setNewMember({ ...newMember, plan_id: e.target.value })
-                  }
-                  className="border rounded-md px-3 py-2 h-10 w-full bg-white text-gray-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select Plan (Optional)</option>
-                  {plans.map((plan) => (
-                    <option key={plan.id} value={plan.id}>
-                      {plan.name} - {plan.duration_days} days - ₹{plan.price}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={createUser}
-                  className={`bg-[${BRAND_COLOR}] hover:bg-[#d53d1e] text-white`}
-                >
-                  Create
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </div>
 
         {/* EDIT MEMBER DIALOG */}
         <AlertDialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Edit Member Details</AlertDialogTitle>
+          <AlertDialogContent
+            className="border-4 border-black bg-white" 
+            style={{ boxShadow: `8px 8px 0 0 ${BRAND_COLOR}` }}
+          >
+            <AlertDialogHeader className="border-b-2 border-black pb-3 mb-2">
+              <AlertDialogTitle className="text-2xl font-extrabold text-black">Edit Member Details</AlertDialogTitle>
               <AlertDialogDescription>
-                Update the details of the selected member. Changing the plan will create a new membership period starting today.
+                Update the details of the selected member.
               </AlertDialogDescription>
             </AlertDialogHeader>
 
-            <div className="grid gap-4 py-4">
-              <Input
+            <div className="grid gap-3 py-3">
+              <NeobrutalistInput
                 placeholder="Full Name"
                 value={editMember.full_name}
                 onChange={(e) =>
                   setEditMember({ ...editMember, full_name: e.target.value })
                 }
               />
-              <Input
+              <NeobrutalistInput
                 type="email"
                 placeholder="Email"
                 value={editMember.email}
@@ -517,14 +590,14 @@ const AdminMembers = () => {
                   setEditMember({ ...editMember, email: e.target.value })
                 }
               />
-              <Input
+              <NeobrutalistInput
                 placeholder="Phone"
                 value={editMember.phone}
                 onChange={(e) =>
                   setEditMember({ ...editMember, phone: e.target.value })
                 }
               />
-              <Input
+              <NeobrutalistInput
                 type="password"
                 placeholder="New Password (optional)"
                 value={editMember.password}
@@ -532,14 +605,13 @@ const AdminMembers = () => {
                   setEditMember({ ...editMember, password: e.target.value })
                 }
               />
-              {/* --- Neobrutalist Plan Dropdown for Edit --- */}
+              {/* Neobrutalist Plan Dropdown for Edit */}
               <div 
                 className="relative"
                 style={{
                   border: `2px solid ${ACCENT_COLOR_B}`,
-                  boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
+                  boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
                   backgroundColor: 'white',
-                  transition: 'box-shadow 0.1s, transform 0.1s', 
                 }}
               >
                   <select
@@ -565,17 +637,24 @@ const AdminMembers = () => {
                       ))}
                   </select>
               </div>
-              {/* --- End Neobrutalist Plan Dropdown --- */}
-
             </div>
 
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogFooter className="pt-4 border-t-2 border-black">
+              <AlertDialogCancel 
+                className="border-2 border-black font-bold"
+                style={{ boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}` }}
+              >
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={updateUser}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase"
+                style={{
+                    border: `2px solid ${ACCENT_COLOR_B}`,
+                    boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
+                }}
               >
-                Update
+                Update Member
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -583,7 +662,8 @@ const AdminMembers = () => {
 
         {/* Members Table */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-64 bg-white rounded-lg shadow-lg">
+          <div className="flex flex-col items-center justify-center h-64 bg-white rounded-lg shadow-lg border-4 border-black"
+               style={{ boxShadow: `8px 8px 0 0 ${BRAND_COLOR}` }}>
             <Loader2
               className={`w-8 h-8 text-[${BRAND_COLOR}] animate-spin`}
             />
@@ -592,30 +672,33 @@ const AdminMembers = () => {
             </p>
           </div>
         ) : (
-          <Card className={`w-full shadow-xl border-t-4 border-t-[${BRAND_COLOR}]`}>
-            <CardHeader>
-              <CardTitle className="text-xl md:text-2xl font-semibold text-gray-800">
-                Registered Members ({filteredMembers.length})
+          <Card 
+            className={`w-full border-4 border-black bg-white overflow-hidden`}
+            style={{ boxShadow: `8px 8px 0 0 ${ACCENT_COLOR_B}` }}
+          >
+            <CardHeader className="bg-gray-100 border-b-2 border-black py-3">
+              <CardTitle className="text-xl md:text-2xl font-bold uppercase text-black">
+                Member Details
               </CardTitle>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <Table>
                   {filteredMembers.length === 0 && (
-                    <TableCaption className="text-lg py-4">
-                      No members found.
+                    <TableCaption className="text-lg py-4 border-t-2 border-black">
+                      No members found matching your search.
                     </TableCaption>
                   )}
 
-                  <TableHeader className="bg-gray-50">
+                  <TableHeader className="bg-gray-200 border-b-2 border-black">
                     <TableRow>
-                      <TableHead>Full Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead className="min-w-[100px]">Plan</TableHead> 
-                      <TableHead className="min-w-[100px]">Expiry</TableHead>
-                      <TableHead className="min-w-[120px]">Joined On</TableHead>
-                      <TableHead className="text-center min-w-[150px]">Actions</TableHead>
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase">Full Name</TableHead>
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase">Email</TableHead>
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase min-w-[100px]">Plan</TableHead> 
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase min-w-[100px]">Expiry</TableHead>
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase min-w-[120px] hidden md:table-cell">Joined On</TableHead>
+                      <TableHead className="p-3 text-center text-sm font-extrabold text-black uppercase min-w-[150px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
 
@@ -623,25 +706,30 @@ const AdminMembers = () => {
                     {filteredMembers.map((user) => (
                       <TableRow
                         key={user.id}
-                        className="hover:bg-gray-50 transition-colors"
+                        className="border-b border-gray-200 hover:bg-yellow-50/50 transition-colors"
                       >
-                        <TableCell className="font-medium min-w-[150px]">{user.full_name}</TableCell>
-                        <TableCell className="min-w-[200px]">{user.email}</TableCell>
+                        <TableCell className="font-semibold text-black min-w-[150px] flex items-center gap-2">
+                           <User className="w-4 h-4 text-gray-500" />
+                            {user.full_name}
+                        </TableCell>
+                        <TableCell className="text-sm text-gray-700 min-w-[200px]">{user.email}</TableCell>
                         <TableCell>
-                            <span className={`px-2 py-1 rounded-full text-xs font-semibold 
-                                ${user.plan_name ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}
+                            <span 
+                                className={`px-3 py-1 text-xs font-bold uppercase border-2 border-black`}
+                                style={{ boxShadow: `1px 1px 0 0 ${ACCENT_COLOR_B}`, backgroundColor: user.plan_name ? '#D1FAE5' : '#F3F4F6' }} // Light green/gray background
                             >
                                 {user.plan_name || "None"}
                             </span>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-sm text-gray-700">
                             {user.expiry_date ? formatDate(user.expiry_date) : "N/A"}
                         </TableCell>
-                        <TableCell>{formatDate(user.created_at)}</TableCell>
+                        <TableCell className="text-sm text-gray-700 hidden md:table-cell">{formatDate(user.created_at)}</TableCell>
                         <TableCell className="text-center flex justify-center gap-2">
                           <Button
                             onClick={() => openEditDialog(user)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 h-auto"
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 h-auto font-bold uppercase border-2 border-black"
+                            style={{ boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}` }}
                           >
                             Edit
                           </Button>
@@ -649,23 +737,31 @@ const AdminMembers = () => {
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
-                                className="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 h-auto"
+                                className="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 h-auto border-2 border-black"
+                                style={{ boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}` }}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent>
+                            <AlertDialogContent 
+                                className="border-4 border-black bg-white" 
+                                style={{ boxShadow: `8px 8px 0 0 ${BRAND_COLOR}` }}
+                            >
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                                <AlertDialogTitle className="text-xl font-extrabold text-red-600">Confirm Deletion</AlertDialogTitle>
                                 <AlertDialogDescription>
                                   Are you sure you want to delete the member **{user.full_name}**? This action cannot be undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogFooter className="pt-4 border-t-2 border-black">
+                                <AlertDialogCancel className="border-2 border-black font-bold">Cancel</AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={() => deleteUser(user.id)}
-                                  className="bg-red-600 hover:bg-red-700 text-white"
+                                  className="bg-red-600 hover:bg-red-700 text-white font-bold uppercase"
+                                  style={{
+                                    border: `2px solid ${ACCENT_COLOR_B}`,
+                                    boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
+                                  }}
                                 >
                                   Delete
                                 </AlertDialogAction>

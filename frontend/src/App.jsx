@@ -7,11 +7,11 @@ import Resgister from './pages/public_pages/Resgister';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MemberProfile from './pages/member/MemberProfile';
-import Trainers from './pages/trainer/Trainers';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import TrainerDashboard from './pages/trainer/TrainerDashboard';
 import AdminMembers from './pages/admin/AdminMembers';
 import MembershipDisplay from './pages/public_pages/MembershipDisplay';
+import AdminTrainers from './pages/admin/AdminTrainers';
 
 function App() {
   return (
@@ -23,15 +23,15 @@ function App() {
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Resgister />} />
-                    <Route path="/trainers" element={<Trainers />} />
                     <Route path="/membership-plans" element={<MembershipDisplay />} />
                     <Route element={<ProtectedRoute />}>
-                        {/* <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/memberships" element={<div>Memberships Page</div>} /> */}
                         <Route path='/profile' element={<MemberProfile/>}/>
+                        {/* Admin Pages */}
                         <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
                         <Route path='/admin/members' element={<AdminMembers/>}/>
-                        <Route path="/admin/trainers" element={<Trainers />} />
+                        <Route path="/admin/trainers" element={<AdminTrainers />} />
+                        
+                        {/* Trainer Pages */}
                         <Route path='/trainer/dashboard' element={<TrainerDashboard/>}/>
                     </Route>
                 </Routes>

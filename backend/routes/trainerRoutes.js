@@ -10,10 +10,11 @@ const {verifyJWT, verifyRole} = require("../controllers/authController")
 
 const router = express.Router();
 
-router.post("/", verifyJWT,verifyRole(["admin"]), createTrainer);
+
+router.post("/", verifyJWT, verifyRole(["admin"]), createTrainer);
 router.get("/", verifyJWT, getAllTrainers);
+router.delete("/:id", verifyJWT, verifyRole(["admin"]), deleteTrainer);
 router.get("/:id", verifyJWT, getTrainerById);
 router.put("/:id", verifyJWT, updateTrainer);
-router.delete("/:id", verifyJWT, deleteTrainer);
 
 module.exports = router;

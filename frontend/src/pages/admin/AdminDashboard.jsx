@@ -24,7 +24,7 @@ const AdminDashboard = () => {
         {/* Navigation */}
         <nav className="flex flex-col space-y-1">
           <Link
-            to="/trainers"
+            to="/admin/trainers"
             className="flex items-center p-3 rounded-lg text-base font-medium text-gray-700 hover:bg-[#F24423] hover:text-white transition-colors duration-150 group"
           >
             <BicepsFlexed className="w-5 h-5 mr-3 group-hover:text-white" />
