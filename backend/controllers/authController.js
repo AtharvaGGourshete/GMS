@@ -66,6 +66,7 @@ const login = (req, res) => {
       token,
       user: { id: user.id, name: user.full_name, email: user.email, role: user.role },
     });
+    
   });
 };
 

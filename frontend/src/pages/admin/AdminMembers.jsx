@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "@/axios";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -93,21 +88,21 @@ const getMobileLinkClass = (path, currentPath) => {
 
 // --- Neobrutalist Input Component (Shared) ---
 const NeobrutalistInput = ({ placeholder, ...props }) => (
-    <div 
-      className="relative w-full"
-      style={{
-        border: `2px solid ${ACCENT_COLOR_B}`,
-        boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
-        backgroundColor: 'white',
-      }}
-    >
-      <Input
-        placeholder={placeholder}
-        className="w-full h-10 px-3 py-2 border-0 focus:ring-0 focus:border-0 appearance-none bg-transparent"
-        style={{ border: 'none' }}
-        {...props}
-      />
-    </div>
+  <div
+    className="relative w-full"
+    style={{
+      border: `2px solid ${ACCENT_COLOR_B}`,
+      boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
+      backgroundColor: "white",
+    }}
+  >
+    <Input
+      placeholder={placeholder}
+      className="w-full h-10 px-3 py-2 border-0 focus:ring-0 focus:border-0 appearance-none bg-transparent"
+      style={{ border: "none" }}
+      {...props}
+    />
+  </div>
 );
 
 // --- AdminMembers Component ---
@@ -129,7 +124,7 @@ const AdminMembers = () => {
     email: "",
     phone: "",
     password: "",
-    plan_id: "", 
+    plan_id: "",
   });
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -140,7 +135,7 @@ const AdminMembers = () => {
     email: "",
     phone: "",
     password: "",
-    plan_id: "", 
+    plan_id: "",
     current_plan_id: "", // Used to check if the plan was actually changed
   });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -148,7 +143,7 @@ const AdminMembers = () => {
   // Fetch all members (users with joined plan data)
   const fetchUsers = async () => {
     try {
-      const response = await api.get("/user"); 
+      const response = await api.get("/user");
       setMembers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -197,7 +192,7 @@ const AdminMembers = () => {
 
   const createUser = async () => {
     const { full_name, email, phone, password, plan_id } = newMember;
-    
+
     if (!full_name || !email || !password) {
       toast.error("Please fill in full name, email, and password.");
       return;
@@ -206,23 +201,23 @@ const AdminMembers = () => {
     try {
       // 1. Create User
       const userPayload = { full_name, email, phone, password };
-      const userResponse = await api.post("/user", userPayload); 
+      const userResponse = await api.post("/user", userPayload);
       const userId = userResponse.data.userId;
 
       let toastMessage = "Member created successfully!";
 
       // 2. Create Membership (if a plan is selected)
       if (plan_id) {
-        const plan = plans.find(p => p.id == plan_id);
-        
+        const plan = plans.find((p) => p.id == plan_id);
+
         if (!plan) {
-             toast.error("Selected plan not found.");
-             return;
+          toast.error("Selected plan not found.");
+          return;
         }
 
         const today = new Date();
         const expiryDate = new Date(today);
-        
+
         // Calculate expiry date
         const durationDays = plan.duration_days;
         expiryDate.setDate(today.getDate() + parseInt(durationDays, 10));
@@ -230,8 +225,8 @@ const AdminMembers = () => {
         const membershipPayload = {
           user_id: userId,
           plan_id: plan_id,
-          join_date: today.toISOString().split('T')[0],
-          expiry_date: expiryDate.toISOString().split('T')[0],
+          join_date: today.toISOString().split("T")[0],
+          expiry_date: expiryDate.toISOString().split("T")[0],
         };
 
         await api.post("/membership", membershipPayload);
@@ -239,12 +234,20 @@ const AdminMembers = () => {
       }
 
       toast.success(toastMessage);
-      setNewMember({ full_name: "", email: "", phone: "", password: "", plan_id: "" });
+      setNewMember({
+        full_name: "",
+        email: "",
+        phone: "",
+        password: "",
+        plan_id: "",
+      });
       setDialogOpen(false);
       fetchUsers();
     } catch (error) {
       console.error("Error creating user/membership:", error);
-      toast.error(error.response?.data?.message || "Failed to create member/membership.");
+      toast.error(
+        error.response?.data?.message || "Failed to create member/membership."
+      );
     }
   };
 
@@ -255,8 +258,8 @@ const AdminMembers = () => {
       email: user.email,
       phone: user.phone || "",
       password: "",
-      plan_id: user.plan_id || "", 
-      current_plan_id: user.plan_id || "", 
+      plan_id: user.plan_id || "",
+      current_plan_id: user.plan_id || "",
     });
     setEditDialogOpen(true);
   };
@@ -278,27 +281,33 @@ const AdminMembers = () => {
       if (editMember.password) {
         updatePayload.password = editMember.password;
       }
-      
+
       await api.put(`/user/${editMember.id}`, updatePayload);
-      
+
       let successMessage = "Member details updated successfully!";
-      
+
       // 2. Check and Update Membership Plan
       const planChanged = editMember.plan_id !== editMember.current_plan_id;
-      
+
       if (planChanged) {
         if (editMember.plan_id) {
           // If a new plan is selected, update the membership
           const membershipUpdatePayload = {
             plan_id: editMember.plan_id,
           };
-          
-          await api.put(`/membership/${editMember.id}/plan`, membershipUpdatePayload);
-          successMessage = "Member details and **Membership Plan updated successfully!**";
+
+          await api.put(
+            `/membership/${editMember.id}/plan`,
+            membershipUpdatePayload
+          );
+          successMessage =
+            "Member details and **Membership Plan updated successfully!**";
         } else if (editMember.current_plan_id && !editMember.plan_id) {
-            // Plan was removed from selection (plan_id is null/empty)
-            // Note: In a real app, you might want a specific endpoint to end/cancel membership
-            toast.warning("Member details updated. Plan was set to 'None'. The old membership status remains unchanged.");
+          // Plan was removed from selection (plan_id is null/empty)
+          // Note: In a real app, you might want a specific endpoint to end/cancel membership
+          toast.warning(
+            "Member details updated. Plan was set to 'None'. The old membership status remains unchanged."
+          );
         }
       }
 
@@ -333,7 +342,7 @@ const AdminMembers = () => {
           to="/admin/trainers"
           className={getLinkClass("/admin/trainers", currentPath)}
         >
-          <BicepsFlexed className="w-5 h-5 mr-3 group-hover:text-white" />
+          <BicepsFlexed className="w-5 h-5 mr-3" />
           Trainers
         </Link>
 
@@ -345,7 +354,7 @@ const AdminMembers = () => {
             className={`w-5 h-5 mr-3 ${
               currentPath === "/admin/members"
                 ? "text-white"
-                : "text-gray-600 group-hover:text-white"
+                : "text-gray-600"
             }`}
           />
           Members
@@ -355,16 +364,8 @@ const AdminMembers = () => {
           to="/admin/classes"
           className={getLinkClass("/admin/classes", currentPath)}
         >
-          <Building2Icon className="w-5 h-5 mr-3 group-hover:text-white" />
+          <Building2Icon className="w-5 h-5 mr-3" />
           Classes
-        </Link>
-
-        <Link
-          to="/admin/attendance"
-          className={getLinkClass("/admin/attendance", currentPath)}
-        >
-          <Calendar className="w-5 h-5 mr-3 group-hover:text-white" />
-          Attendance
         </Link>
       </nav>
     </aside>
@@ -374,8 +375,8 @@ const AdminMembers = () => {
     <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t z-50 md:hidden shadow-lg">
       <div className="flex justify-around h-full">
         <Link to="/admin" className={getMobileLinkClass("/admin", currentPath)}>
-            <Home className="w-5 h-5" />
-            <span className="mt-1">Dashboard</span>
+          <Home className="w-5 h-5" />
+          <span className="mt-1">Dashboard</span>
         </Link>
         <Link
           to="/admin/trainers"
@@ -418,7 +419,6 @@ const AdminMembers = () => {
       {DesktopSidebar}
 
       <main className="flex-1 p-4 md:p-8">
-        
         {/* Header and Controls (Neobrutalist Style) */}
         <div className="flex justify-between items-center mb-6 border-b-4 border-black pb-4">
           <h1 className="text-3xl font-extrabold uppercase tracking-tight text-black">
@@ -426,98 +426,99 @@ const AdminMembers = () => {
           </h1>
 
           <div className="flex gap-4 items-center">
-            
             {/* Search Input (Neobrutalist Style) */}
-            <div 
-                className="relative hidden md:block"
-                style={{
-                    border: `2px solid ${ACCENT_COLOR_B}`,
-                    boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
-                    backgroundColor: 'white',
-                }}
+            <div
+              className="relative hidden md:block"
+              style={{
+                border: `2px solid ${ACCENT_COLOR_B}`,
+                boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
+                backgroundColor: "white",
+              }}
             >
-                <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
-                <Input
-                  placeholder="Search members..."
-                  className="pl-8 border-0 focus:ring-0 focus:border-0 appearance-none bg-transparent"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ border: 'none' }}
-                />
+              <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
+              <Input
+                placeholder="Search members..."
+                className="pl-8 border-0 focus:ring-0 focus:border-0 appearance-none bg-transparent"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ border: "none" }}
+              />
             </div>
 
             {/* ADD MEMBER DIALOG */}
             <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <AlertDialogTrigger asChild>
-                <Button 
-                    className="text-white font-bold uppercase transition-all duration-200"
-                    style={{
-                        backgroundColor: BRAND_COLOR,
-                        border: `2px solid ${ACCENT_COLOR_B}`,
-                        boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
-                    }}
+                <Button
+                  className="text-white font-bold uppercase transition-all duration-200"
+                  style={{
+                    backgroundColor: BRAND_COLOR,
+                    border: `2px solid ${ACCENT_COLOR_B}`,
+                    boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
+                  }}
                 >
                   <UserPlus className="w-4 h-4 mr-2" /> Add Member
                 </Button>
               </AlertDialogTrigger>
 
-              <AlertDialogContent 
-                className="border-4 border-black bg-white" 
+              <AlertDialogContent
+                className="border-4 border-black bg-white"
                 style={{ boxShadow: `8px 8px 0 0 ${BRAND_COLOR}` }}
               >
                 <AlertDialogHeader className="border-b-2 border-black pb-3 mb-2">
-                  <AlertDialogTitle className="text-2xl font-extrabold text-black">Add a New Member</AlertDialogTitle>
+                  <AlertDialogTitle className="text-2xl font-extrabold text-black">
+                    Add a New Member
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
                     Fill in the details below to register a new member.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <div className="grid gap-3 py-3">
-                    <NeobrutalistInput
-                        placeholder="Full Name (Required)"
-                        value={newMember.full_name}
-                        onChange={(e) =>
-                            setNewMember({ ...newMember, full_name: e.target.value })
-                        }
-                    />
-                    <NeobrutalistInput
-                        type="email"
-                        placeholder="Email (Required)"
-                        value={newMember.email}
-                        onChange={(e) =>
-                            setNewMember({ ...newMember, email: e.target.value })
-                        }
-                    />
-                    <NeobrutalistInput
-                        placeholder="Phone"
-                        value={newMember.phone}
-                        onChange={(e) =>
-                            setNewMember({ ...newMember, phone: e.target.value })
-                        }
-                    />
-                    <NeobrutalistInput
-                        type="password"
-                        placeholder="Password (Required)"
-                        value={newMember.password}
-                        onChange={(e) =>
-                            setNewMember({ ...newMember, password: e.target.value })
-                        }
-                    />
-                    {/* Neobrutalist Plan Dropdown for Add Member */}
-                    <div 
-                        className="relative"
-                        style={{
-                            border: `2px solid ${ACCENT_COLOR_B}`,
-                            boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
-                            backgroundColor: 'white',
-                        }}
-                    >
-                        <select
-                            value={newMember.plan_id}
-                            onChange={(e) =>
-                                setNewMember({ ...newMember, plan_id: e.target.value })
-                            }
-                            className="
+                  <NeobrutalistInput
+                    placeholder="Full Name (Required)"
+                    value={newMember.full_name}
+                    onChange={(e) =>
+                      setNewMember({ ...newMember, full_name: e.target.value })
+                    }
+                  />
+                  <NeobrutalistInput
+                    type="email"
+                    placeholder="Email (Required)"
+                    value={newMember.email}
+                    onChange={(e) =>
+                      setNewMember({ ...newMember, email: e.target.value })
+                    }
+                  />
+                  <NeobrutalistInput
+                    placeholder="Phone"
+                    value={newMember.phone}
+                    onChange={(e) =>
+                      setNewMember({ ...newMember, phone: e.target.value })
+                    }
+                  />
+                  <NeobrutalistInput
+                    type="password"
+                    placeholder="Password (Required)"
+                    value={newMember.password}
+                    onChange={(e) =>
+                      setNewMember({ ...newMember, password: e.target.value })
+                    }
+                  />
+                  {/* Neobrutalist Plan Dropdown for Add Member */}
+                  <div
+                    className="relative"
+                    style={{
+                      border: `2px solid ${ACCENT_COLOR_B}`,
+                      boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
+                      backgroundColor: "white",
+                    }}
+                  >
+                    <select
+                      value={newMember.plan_id}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, plan_id: e.target.value })
+                      }
+                      className="
                                 h-10 w-full px-3 py-2 
                                 bg-white text-gray-700 
                                 border-0 
@@ -525,20 +526,21 @@ const AdminMembers = () => {
                                 appearance-none 
                                 cursor-pointer
                             "
-                            style={{ border: 'none' }}
-                        >
-                            <option value="">Select Plan (Optional)</option>
-                            {plans.map((plan) => (
-                                <option key={plan.id} value={plan.id}>
-                                    {plan.name} - {plan.duration_days} days - ₹{plan.price}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                      style={{ border: "none" }}
+                    >
+                      <option value="">Select Plan (Optional)</option>
+                      {plans.map((plan) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.name} - {plan.duration_days} days - ₹
+                          {plan.price}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <AlertDialogFooter className="pt-4 border-t-2 border-black">
-                  <AlertDialogCancel 
+                  <AlertDialogCancel
                     className="border-2 border-black font-bold"
                     style={{ boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}` }}
                   >
@@ -548,9 +550,9 @@ const AdminMembers = () => {
                     onClick={createUser}
                     className="text-white font-bold uppercase"
                     style={{
-                        backgroundColor: BRAND_COLOR,
-                        border: `2px solid ${ACCENT_COLOR_B}`,
-                        boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
+                      backgroundColor: BRAND_COLOR,
+                      border: `2px solid ${ACCENT_COLOR_B}`,
+                      boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
                     }}
                   >
                     Create Member
@@ -564,11 +566,13 @@ const AdminMembers = () => {
         {/* EDIT MEMBER DIALOG */}
         <AlertDialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
           <AlertDialogContent
-            className="border-4 border-black bg-white" 
+            className="border-4 border-black bg-white"
             style={{ boxShadow: `8px 8px 0 0 ${BRAND_COLOR}` }}
           >
             <AlertDialogHeader className="border-b-2 border-black pb-3 mb-2">
-              <AlertDialogTitle className="text-2xl font-extrabold text-black">Edit Member Details</AlertDialogTitle>
+              <AlertDialogTitle className="text-2xl font-extrabold text-black">
+                Edit Member Details
+              </AlertDialogTitle>
               <AlertDialogDescription>
                 Update the details of the selected member.
               </AlertDialogDescription>
@@ -606,20 +610,20 @@ const AdminMembers = () => {
                 }
               />
               {/* Neobrutalist Plan Dropdown for Edit */}
-              <div 
+              <div
                 className="relative"
                 style={{
                   border: `2px solid ${ACCENT_COLOR_B}`,
                   boxShadow: `3px 3px 0 0 ${BRAND_COLOR}`,
-                  backgroundColor: 'white',
+                  backgroundColor: "white",
                 }}
               >
-                  <select
-                      value={editMember.plan_id}
-                      onChange={(e) =>
-                          setEditMember({ ...editMember, plan_id: e.target.value })
-                      }
-                      className="
+                <select
+                  value={editMember.plan_id}
+                  onChange={(e) =>
+                    setEditMember({ ...editMember, plan_id: e.target.value })
+                  }
+                  className="
                           h-10 w-full px-3 py-2 
                           bg-white text-gray-700 
                           border-0 
@@ -627,20 +631,20 @@ const AdminMembers = () => {
                           appearance-none 
                           cursor-pointer
                       "
-                      style={{ border: 'none' }}
-                  >
-                      <option value="">Select Plan</option>
-                      {plans.map((plan) => (
-                          <option key={plan.id} value={plan.id}>
-                              {plan.name} - {plan.duration_days} days - ₹{plan.price}
-                          </option>
-                      ))}
-                  </select>
+                  style={{ border: "none" }}
+                >
+                  <option value="">Select Plan</option>
+                  {plans.map((plan) => (
+                    <option key={plan.id} value={plan.id}>
+                      {plan.name} - {plan.duration_days} days - ₹{plan.price}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
             <AlertDialogFooter className="pt-4 border-t-2 border-black">
-              <AlertDialogCancel 
+              <AlertDialogCancel
                 className="border-2 border-black font-bold"
                 style={{ boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}` }}
               >
@@ -650,8 +654,8 @@ const AdminMembers = () => {
                 onClick={updateUser}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase"
                 style={{
-                    border: `2px solid ${ACCENT_COLOR_B}`,
-                    boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
+                  border: `2px solid ${ACCENT_COLOR_B}`,
+                  boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
                 }}
               >
                 Update Member
@@ -662,17 +666,17 @@ const AdminMembers = () => {
 
         {/* Members Table */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-64 bg-white rounded-lg shadow-lg border-4 border-black"
-               style={{ boxShadow: `8px 8px 0 0 ${BRAND_COLOR}` }}>
-            <Loader2
-              className={`w-8 h-8 text-[${BRAND_COLOR}] animate-spin`}
-            />
+          <div
+            className="flex flex-col items-center justify-center h-64 bg-white rounded-lg shadow-lg border-4 border-black"
+            style={{ boxShadow: `8px 8px 0 0 ${BRAND_COLOR}` }}
+          >
+            <Loader2 className={`w-8 h-8 text-[${BRAND_COLOR}] animate-spin`} />
             <p className="mt-4 text-gray-600">
               Loading all registered members...
             </p>
           </div>
         ) : (
-          <Card 
+          <Card
             className={`w-full border-4 border-black bg-white overflow-hidden`}
             style={{ boxShadow: `8px 8px 0 0 ${ACCENT_COLOR_B}` }}
           >
@@ -693,12 +697,27 @@ const AdminMembers = () => {
 
                   <TableHeader className="bg-gray-200 border-b-2 border-black">
                     <TableRow>
-                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase">Full Name</TableHead>
-                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase">Email</TableHead>
-                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase min-w-[100px]">Plan</TableHead> 
-                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase min-w-[100px]">Expiry</TableHead>
-                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase min-w-[120px] hidden md:table-cell">Joined On</TableHead>
-                      <TableHead className="p-3 text-center text-sm font-extrabold text-black uppercase min-w-[150px]">Actions</TableHead>
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase">
+                        Full Name
+                      </TableHead>
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase">
+                        Email
+                      </TableHead>
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase min-w-[100px]">
+                        Plan
+                      </TableHead>
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase min-w-[100px]">
+                        Phone
+                      </TableHead>
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase min-w-[100px]">
+                        Expiry
+                      </TableHead>
+                      <TableHead className="p-3 text-left text-sm font-extrabold text-black uppercase min-w-[120px] hidden md:table-cell">
+                        Joined On
+                      </TableHead>
+                      <TableHead className="p-3 text-center text-sm font-extrabold text-black uppercase min-w-[150px]">
+                        Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
 
@@ -709,27 +728,41 @@ const AdminMembers = () => {
                         className="border-b border-gray-200 hover:bg-yellow-50/50 transition-colors"
                       >
                         <TableCell className="font-semibold text-black min-w-[150px] flex items-center gap-2">
-                           <User className="w-4 h-4 text-gray-500" />
-                            {user.full_name}
+                          <User className="w-4 h-4 text-gray-500" />
+                          {user.full_name}
                         </TableCell>
-                        <TableCell className="text-sm text-gray-700 min-w-[200px]">{user.email}</TableCell>
+                        <TableCell className="text-sm text-gray-700 min-w-[200px]">
+                          {user.email}
+                        </TableCell>
                         <TableCell>
-                            <span 
-                                className={`px-3 py-1 text-xs font-bold uppercase border-2 border-black`}
-                                style={{ boxShadow: `1px 1px 0 0 ${ACCENT_COLOR_B}`, backgroundColor: user.plan_name ? '#D1FAE5' : '#F3F4F6' }} // Light green/gray background
-                            >
-                                {user.plan_name || "None"}
-                            </span>
+                          <span
+                            className={`px-3 py-1 text-xs font-bold uppercase border-2 border-black`}
+                            style={{
+                              boxShadow: `1px 1px 0 0 ${ACCENT_COLOR_B}`,
+                              backgroundColor: user.plan_name
+                                ? "#D1FAE5"
+                                : "#F3F4F6",
+                            }} // Light green/gray background
+                          >
+                            {user.plan_name || "None"}
+                          </span>
                         </TableCell>
+                        <TableCell>{user.phone}</TableCell>
                         <TableCell className="text-sm text-gray-700">
-                            {user.expiry_date ? formatDate(user.expiry_date) : "N/A"}
+                          {user.expiry_date
+                            ? formatDate(user.expiry_date)
+                            : "N/A"}
                         </TableCell>
-                        <TableCell className="text-sm text-gray-700 hidden md:table-cell">{formatDate(user.created_at)}</TableCell>
+                        <TableCell className="text-sm text-gray-700 hidden md:table-cell">
+                          {formatDate(user.created_at)}
+                        </TableCell>
                         <TableCell className="text-center flex justify-center gap-2">
                           <Button
                             onClick={() => openEditDialog(user)}
                             className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 h-auto font-bold uppercase border-2 border-black"
-                            style={{ boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}` }}
+                            style={{
+                              boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}`,
+                            }}
                           >
                             Edit
                           </Button>
@@ -738,23 +771,33 @@ const AdminMembers = () => {
                             <AlertDialogTrigger asChild>
                               <Button
                                 className="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 h-auto border-2 border-black"
-                                style={{ boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}` }}
+                                style={{
+                                  boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}`,
+                                }}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent 
-                                className="border-4 border-black bg-white" 
-                                style={{ boxShadow: `8px 8px 0 0 ${BRAND_COLOR}` }}
+                            <AlertDialogContent
+                              className="border-4 border-black bg-white"
+                              style={{
+                                boxShadow: `8px 8px 0 0 ${BRAND_COLOR}`,
+                              }}
                             >
                               <AlertDialogHeader>
-                                <AlertDialogTitle className="text-xl font-extrabold text-red-600">Confirm Deletion</AlertDialogTitle>
+                                <AlertDialogTitle className="text-xl font-extrabold text-red-600">
+                                  Confirm Deletion
+                                </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Are you sure you want to delete the member **{user.full_name}**? This action cannot be undone.
+                                  Are you sure you want to delete the member **
+                                  {user.full_name}**? This action cannot be
+                                  undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter className="pt-4 border-t-2 border-black">
-                                <AlertDialogCancel className="border-2 border-black font-bold">Cancel</AlertDialogCancel>
+                                <AlertDialogCancel className="border-2 border-black font-bold">
+                                  Cancel
+                                </AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={() => deleteUser(user.id)}
                                   className="bg-red-600 hover:bg-red-700 text-white font-bold uppercase"

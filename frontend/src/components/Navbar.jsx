@@ -31,7 +31,7 @@ const Navbar = () => {
       {/* Admin Dashboard Link (Appears only for the admin user) */}
       {isAdmin && (
         <Link 
-          to="/admin/dashboard" 
+          to="/admin/trainers" 
           onClick={() => setIsMenuOpen(false)} 
           className="cursor-pointer block py-2 px-4 text-center sm:text-left border-b-2 border-[#F24423] md:border-b-0"
         >
@@ -42,7 +42,7 @@ const Navbar = () => {
       {/* Standard Links */}
       <Link to="/membership-plans" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>Memberships</Link>
       {/* <Link to="/trainers" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>Trainers</Link> */}
-      <Link to="/about" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>About Us</Link>
+      <Link to="/aboutus" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>About Us</Link>
     </>
   );
 

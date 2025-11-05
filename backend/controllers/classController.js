@@ -1,39 +1,33 @@
 const db = require("../config/db");
 
-// ✅ Create a new class (with trainer existence check)
 exports.createClass = (req, res) => {
-  const { name, trainer_id, schedule_time, capacity } = req.body;
+  // Destructure the new field name: trainer_user_id
+  const { name, trainer_user_id, schedule_time, capacity } = req.body;
 
-  if (!name || !trainer_id || !schedule_time) {
-    return res.status(400).json({ message: "Name, trainer_id and schedule_time are required." });
+  // Basic validation (you should add more robust validation)
+  if (!name || !trainer_user_id || !schedule_time) {
+    return res.status(400).json({ message: "Missing required class fields." });
   }
 
-  // Check if trainer exists
-  db.query("SELECT id FROM trainers WHERE id = ?", [trainer_id], (err, trainerResult) => {
+  // 🚨 IMPORTANT: The INSERT query MUST use the new column name (trainer_user_id)
+  const query = `
+    INSERT INTO classes (name, trainer_user_id, schedule_time, capacity)
+    VALUES (?, ?, ?, ?)
+  `;
+  const values = [name, trainer_user_id, schedule_time, capacity || 20]; // Default capacity to 20 if not provided
+
+  db.query(query, values, (err, result) => {
     if (err) {
-      console.error("Error checking trainer:", err);
-      return res.status(500).json({ message: "Database error", error: err });
-    }
-
-    if (trainerResult.length === 0) {
-      return res.status(404).json({ message: "Trainer not found." });
-    }
-
-    const query = `
-      INSERT INTO classes (name, trainer_id, schedule_time, capacity)
-      VALUES (?, ?, ?, ?)
-    `;
-
-    db.query(query, [name, trainer_id, schedule_time, capacity || 20], (err, result) => {
-      if (err) {
-        console.error("Error creating class:", err);
-        return res.status(500).json({ message: "Database error", error: err });
+      console.error("Error creating class:", err);
+      // Check for Foreign Key constraint violation (e.g., trainer_user_id doesn't exist or isn't a trainer)
+      if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+         return res.status(409).json({ message: "Invalid Trainer ID or Trainer does not exist." });
       }
-
-      res.status(201).json({
-        message: "Class created successfully.",
-        classId: result.insertId,
-      });
+      return res.status(500).json({ message: "Database error during class creation." });
+    }
+    res.status(201).json({ 
+        id: result.insertId, 
+        message: "Class created successfully!" 
     });
   });
 };
@@ -41,10 +35,17 @@ exports.createClass = (req, res) => {
 // ✅ Get all classes (with trainer name)
 exports.getAllClasses = (req, res) => {
   const query = `
-    SELECT c.id, c.name, c.schedule_time, c.capacity, t.name AS trainer_name
+    SELECT
+      c.id,
+      c.name,
+      c.schedule_time,
+      c.capacity,
+      c.created_at,
+      u.full_name AS trainer_name 
     FROM classes c
-    JOIN trainers t ON c.trainer_id = t.id
-    ORDER BY c.schedule_time ASC
+    JOIN users u ON c.trainer_user_id = u.id  
+    WHERE u.role_id = 2
+    ORDER BY c.schedule_time DESC
   `;
 
   db.query(query, (err, results) => {
@@ -82,40 +83,44 @@ exports.getClassById = (req, res) => {
   });
 };
 
-// ✅ Update class (with trainer validation)
 exports.updateClass = (req, res) => {
-  const { id } = req.params;
-  const { name, trainer_id, schedule_time, capacity } = req.body;
+  const { id } = req.params; // Class ID to update
+  // Destructure the new field name: trainer_user_id
+  const { name, trainer_user_id, schedule_time, capacity } = req.body;
 
-  if (!name || !trainer_id || !schedule_time) {
-    return res.status(400).json({ message: "Name, trainer_id, and schedule_time are required." });
+  // Basic validation
+  if (!name || !trainer_user_id || !schedule_time) {
+    return res.status(400).json({ message: "Missing required class fields." });
   }
 
-  // Validate trainer existence
-  db.query("SELECT id FROM trainers WHERE id = ?", [trainer_id], (err, trainerResult) => {
+  // 🚨 IMPORTANT: The UPDATE query MUST use the new column name (trainer_user_id)
+  const query = `
+    UPDATE classes 
+    SET 
+      name = ?, 
+      trainer_user_id = ?, 
+      schedule_time = ?, 
+      capacity = ?, 
+      updated_at = NOW()
+    WHERE id = ?
+  `;
+  const values = [name, trainer_user_id, schedule_time, capacity || 20, id];
+
+  db.query(query, values, (err, result) => {
     if (err) {
-      console.error("Error checking trainer:", err);
-      return res.status(500).json({ message: "Database error", error: err });
-    }
-
-    if (trainerResult.length === 0) {
-      return res.status(404).json({ message: "Trainer not found." });
-    }
-
-    const query = `
-      UPDATE classes 
-      SET name = ?, trainer_id = ?, schedule_time = ?, capacity = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `;
-
-    db.query(query, [name, trainer_id, schedule_time, capacity || 20, id], (err, result) => {
-      if (err) {
-        console.error("Error updating class:", err);
-        return res.status(500).json({ message: "Database error", error: err });
+      console.error("Error updating class:", err);
+       // Check for Foreign Key constraint violation
+       if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+         return res.status(409).json({ message: "Invalid Trainer ID or Trainer does not exist." });
       }
-
-      res.status(200).json({ message: "Class updated successfully." });
-    });
+      return res.status(500).json({ message: "Database error during class update." });
+    }
+    
+    if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Class not found." });
+    }
+    
+    res.status(200).json({ message: "Class updated successfully!" });
   });
 };
 

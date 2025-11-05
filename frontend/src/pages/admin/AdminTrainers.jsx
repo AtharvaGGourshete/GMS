@@ -162,20 +162,16 @@ const AdminTrainers = () => {
                       to="/admin/trainers"
                       className={getLinkClass("/admin/trainers", currentPath)}
                     >
-                      <BicepsFlexed className="w-5 h-5 mr-3 group-hover:text-white" />
+                      <BicepsFlexed className="w-5 h-5 mr-3 " />
                       Trainers
                     </Link>
             <Link to="/admin/members" className={getLinkClass("/admin/members", currentPath)}>
-                <Users className="w-5 h-5 mr-3 group-hover:text-white" />
+                <Users className="w-5 h-5 mr-3" />
                 Members
             </Link>
             <Link to="/admin/classes" className={getLinkClass("/admin/classes", currentPath)}>
-                <Building2Icon className="w-5 h-5 mr-3 group-hover:text-white" />
-                Classes
-            </Link>
-            <Link to="/admin/attendance" className={getLinkClass("/admin/attendance", currentPath)}>
-                <Calendar className="w-5 h-5 mr-3 group-hover:text-white" />
-                Attendance
+                <Building2Icon className="w-5 h-5 mr-3 " />
+                Classe
             </Link>
         </nav>
     </aside>

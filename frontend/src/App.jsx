@@ -12,6 +12,8 @@ import TrainerDashboard from './pages/trainer/TrainerDashboard';
 import AdminMembers from './pages/admin/AdminMembers';
 import MembershipDisplay from './pages/public_pages/MembershipDisplay';
 import AdminTrainers from './pages/admin/AdminTrainers';
+import AdminClasses from './pages/admin/AdminClasses';
+import AboutUs from './pages/public_pages/AboutUs';
 
 function App() {
   return (
@@ -24,16 +26,21 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Resgister />} />
                     <Route path="/membership-plans" element={<MembershipDisplay />} />
+                    <Route path="/aboutus" element={<AboutUs />} />
+
                     <Route element={<ProtectedRoute />}>
                         <Route path='/profile' element={<MemberProfile/>}/>
                         {/* Admin Pages */}
                         <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
                         <Route path='/admin/members' element={<AdminMembers/>}/>
                         <Route path="/admin/trainers" element={<AdminTrainers />} />
+                        <Route path="/admin/classes" element={<AdminClasses />} />
                         
                         {/* Trainer Pages */}
                         <Route path='/trainer/dashboard' element={<TrainerDashboard/>}/>
                     </Route>
+
+
                 </Routes>
                 <Footer/>
             </Router>
