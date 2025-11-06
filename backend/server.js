@@ -7,7 +7,6 @@ const membershipRoutes = require("./routes/membershipRoutes")
 const attendanceRoutes = require("./routes/attendanceRoutes")
 const trainerRoutes = require("./routes/trainerRoutes");
 const classRoutes = require("./routes/classRoutes");
-// 👈 Import new plans route
 const planRoutes = require("./routes/planRoutes"); 
 
 dotenv.config()

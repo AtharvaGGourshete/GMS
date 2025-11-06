@@ -86,33 +86,38 @@ const deleteUser = (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  // NOTE: The frontend now sends plan_id separately to /membership
-  const { full_name, email, phone, password } = req.body; 
-
-  if (!full_name || !email || !password)
-    return res.status(400).json({ message: "All required fields must be filled" });
-
   try {
+    const { full_name, email, phone, password } = req.body;
+
+    if (!full_name || !email || !password) {
+      return res.status(400).json({ message: "Full name, email, and password are required" });
+    }
+
+    // Hash password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
-    const query = `INSERT INTO users (full_name, email, phone, password_hash, role_id) VALUES (?, ?, ?, ?, 3)`;
-    
-    // The insert operation needs to return the ID of the newly created user.
-    // In many MySQL libraries, the results object contains insertId.
-    db.query(query, [full_name, email, phone, hashedPassword], (err, results) => {
+
+    // Default role_id = 3 (assuming 3 = member)
+    const role_id = 3;
+
+    const query = `
+      INSERT INTO users (full_name, email, phone, password_hash, role_id)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    db.query(query, [full_name, email, phone, hashedPassword, role_id], (err, result) => {
       if (err) {
-        console.error("DB Error:", err);
-        return res.status(500).json({ message: "Database Error", error: err });
+        console.error("Database error inserting user:", err);
+        return res.status(500).json({ message: "Database error", error: err.sqlMessage });
       }
-      
-      // 👈 CRITICAL CHANGE: Return the new user ID
-      res.status(201).json({ 
-          message: "User created successfully",
-          userId: results.insertId 
-      }); 
+
+      res.status(201).json({
+        message: "User created successfully",
+        userId: result.insertId,
+      });
     });
-  } catch (err) {
-    console.error("Error creating user:", err);
-    res.status(500).json({ message: "Error creating user" });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 

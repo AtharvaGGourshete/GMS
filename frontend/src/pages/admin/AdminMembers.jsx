@@ -191,65 +191,59 @@ const AdminMembers = () => {
   };
 
   const createUser = async () => {
-    const { full_name, email, phone, password, plan_id } = newMember;
+  const { full_name, email, phone, password, plan_id } = newMember;
 
-    if (!full_name || !email || !password) {
-      toast.error("Please fill in full name, email, and password.");
-      return;
-    }
+  if (!full_name || !email || !password) {
+    toast.error("Please fill in full name, email, and password.");
+    return;
+  }
 
-    try {
-      // 1. Create User
-      const userPayload = { full_name, email, phone, password };
-      const userResponse = await api.post("/user", userPayload);
-      const userId = userResponse.data.userId;
+  try {
+    // 1. Create User
+    const userPayload = { full_name, email, phone, password }; // backend will hash password
+    const userResponse = await api.post("/user", userPayload);
+    const userId = userResponse.data.id; // or userResponse.data.userId depending on backend
 
-      let toastMessage = "Member created successfully!";
-
-      // 2. Create Membership (if a plan is selected)
-      if (plan_id) {
-        const plan = plans.find((p) => p.id == plan_id);
-
-        if (!plan) {
-          toast.error("Selected plan not found.");
-          return;
-        }
-
-        const today = new Date();
-        const expiryDate = new Date(today);
-
-        // Calculate expiry date
-        const durationDays = plan.duration_days;
-        expiryDate.setDate(today.getDate() + parseInt(durationDays, 10));
-
-        const membershipPayload = {
-          user_id: userId,
-          plan_id: plan_id,
-          join_date: today.toISOString().split("T")[0],
-          expiry_date: expiryDate.toISOString().split("T")[0],
-        };
-
-        await api.post("/membership", membershipPayload);
-        toastMessage = "Member and Membership created successfully!";
+    // 2. Create Membership if plan selected
+    if (plan_id) {
+      const plan = plans.find((p) => p.id === Number(plan_id));
+      if (!plan) {
+        toast.error("Selected plan not found.");
+        return;
       }
 
-      toast.success(toastMessage);
-      setNewMember({
-        full_name: "",
-        email: "",
-        phone: "",
-        password: "",
-        plan_id: "",
-      });
-      setDialogOpen(false);
-      fetchUsers();
-    } catch (error) {
-      console.error("Error creating user/membership:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to create member/membership."
-      );
+      const today = new Date();
+      const expiryDate = new Date(today);
+      expiryDate.setDate(today.getDate() + plan.duration_days);
+
+      const membershipPayload = {
+        user_id: Number(userId),   // must be number
+        plan_id: Number(plan_id),  // must be number
+        join_date: today.toISOString().split("T")[0],
+        expiry_date: expiryDate.toISOString().split("T")[0],
+      };
+
+      await api.post("/membership", membershipPayload);
+      toast.success("Member and Membership created successfully!");
+    } else {
+      toast.success("Member created successfully!");
     }
-  };
+
+    setNewMember({
+      full_name: "",
+      email: "",
+      phone: "",
+      password: "",
+      plan_id: "",
+    });
+    setDialogOpen(false);
+    fetchUsers();
+  } catch (error) {
+    console.error("Error creating user/membership:", error.response?.data);
+    toast.error(error.response?.data?.message || "Failed to create member/membership.");
+  }
+};
+
 
   const openEditDialog = (user) => {
     setEditMember({
@@ -271,44 +265,26 @@ const AdminMembers = () => {
     }
 
     try {
-      // 1. Update User Details (Name, Email, Phone, Password)
+      // Update user info
       const updatePayload = {
         full_name: editMember.full_name,
         email: editMember.email,
         phone: editMember.phone,
       };
 
-      if (editMember.password) {
-        updatePayload.password = editMember.password;
-      }
+      if (editMember.password) updatePayload.password = editMember.password;
 
       await api.put(`/user/${editMember.id}`, updatePayload);
 
       let successMessage = "Member details updated successfully!";
 
-      // 2. Check and Update Membership Plan
+      // Check plan change
       const planChanged = editMember.plan_id !== editMember.current_plan_id;
-
-      if (planChanged) {
-        if (editMember.plan_id) {
-          // If a new plan is selected, update the membership
-          const membershipUpdatePayload = {
-            plan_id: editMember.plan_id,
-          };
-
-          await api.put(
-            `/membership/${editMember.id}/plan`,
-            membershipUpdatePayload
-          );
-          successMessage =
-            "Member details and **Membership Plan updated successfully!**";
-        } else if (editMember.current_plan_id && !editMember.plan_id) {
-          // Plan was removed from selection (plan_id is null/empty)
-          // Note: In a real app, you might want a specific endpoint to end/cancel membership
-          toast.warning(
-            "Member details updated. Plan was set to 'None'. The old membership status remains unchanged."
-          );
-        }
+      if (planChanged && editMember.plan_id) {
+        const membershipPayload = { plan_id: editMember.plan_id };
+        await api.put(`/membership/${editMember.id}/plan`, membershipPayload);
+        successMessage =
+          "Member details and membership plan updated successfully!";
       }
 
       toast.success(successMessage);
@@ -352,9 +328,7 @@ const AdminMembers = () => {
         >
           <Users
             className={`w-5 h-5 mr-3 ${
-              currentPath === "/admin/members"
-                ? "text-white"
-                : "text-gray-600"
+              currentPath === "/admin/members" ? "text-white" : "text-gray-600"
             }`}
           />
           Members

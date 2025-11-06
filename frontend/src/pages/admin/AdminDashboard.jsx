@@ -40,19 +40,11 @@ const AdminDashboard = () => {
           </Link>
 
           <Link
-            to="/admin/settings" // Changed to admin path for clarity
+            to="/admin/classes" // Changed to admin path for clarity
             className="flex items-center p-3 rounded-lg text-base font-medium text-gray-700 hover:bg-[#F24423] hover:text-white transition-colors duration-150 group"
           >
             <Building2Icon className="w-5 h-5 mr-3 group-hover:text-white" />
-            Class
-          </Link>
-
-          <Link
-            to="/admin/settings" // Changed to admin path for clarity
-            className="flex items-center p-3 rounded-lg text-base font-medium text-gray-700 hover:bg-[#F24423] hover:text-white transition-colors duration-150 group"
-          >
-            <Calendar className="w-5 h-5 mr-3 group-hover:text-white" />
-            Attendance
+            Classes
           </Link>
         </nav>
       </aside>
