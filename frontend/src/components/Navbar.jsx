@@ -39,7 +39,7 @@ const Navbar = () => {
 
       {isMember && (
         <Link 
-          to="/trainer/dashboard" 
+          to="/trainer/members" 
           onClick={() => setIsMenuOpen(false)} 
           className="font-black uppercase tracking-wide cursor-pointer block py-3 px-4 text-center sm:text-left bg-cyan-300 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all mb-2 sm:mb-0"
         >
@@ -59,16 +59,15 @@ const Navbar = () => {
   return (
     <nav className="border-b-8 border-black shadow-[0_8px_0px_0px_rgba(0,0,0,1)] sticky top-0 z-40 bg-white">
       <div className="flex justify-between items-center h-20 px-4 max-w-7xl mx-auto">
-        {/* Logo Section - Neobrutalism */}
-        <Link to="/">
+        
           <div className="flex items-center font-black text-3xl sm:text-4xl uppercase tracking-tighter ">
-            <img src="main-bg.png" width={50} height={50} className="-mr-2"/>
-            <span className="text-black">ym</span>
+            
+            <span className="text-black">Gym</span>
             <span className="text-[#F24423] bg-yellow-300 px-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -rotate-2">
               ie
             </span>
           </div>
-        </Link>
+        
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex space-x-6 lg:space-x-8 items-center">

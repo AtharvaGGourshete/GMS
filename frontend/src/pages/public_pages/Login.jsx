@@ -49,7 +49,7 @@ export default function Login() {
           navigate("/admin/landing");
           break;
         case "trainer":
-          navigate("/trainer/dashboard");
+          navigate("/trainer/landing");
           break;
         case "member":
         default:

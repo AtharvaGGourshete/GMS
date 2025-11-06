@@ -1,36 +1,6 @@
 const db = require("../config/db");
 
-exports.createClass = (req, res) => {
-  // Destructure the new field name: trainer_user_id
-  const { name, trainer_user_id, schedule_time, capacity } = req.body;
 
-  // Basic validation (you should add more robust validation)
-  if (!name || !trainer_user_id || !schedule_time) {
-    return res.status(400).json({ message: "Missing required class fields." });
-  }
-
-  // 🚨 IMPORTANT: The INSERT query MUST use the new column name (trainer_user_id)
-  const query = `
-    INSERT INTO classes (name, trainer_user_id, schedule_time, capacity)
-    VALUES (?, ?, ?, ?)
-  `;
-  const values = [name, trainer_user_id, schedule_time, capacity || 20]; // Default capacity to 20 if not provided
-
-  db.query(query, values, (err, result) => {
-    if (err) {
-      console.error("Error creating class:", err);
-      // Check for Foreign Key constraint violation (e.g., trainer_user_id doesn't exist or isn't a trainer)
-      if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-         return res.status(409).json({ message: "Invalid Trainer ID or Trainer does not exist." });
-      }
-      return res.status(500).json({ message: "Database error during class creation." });
-    }
-    res.status(201).json({ 
-        id: result.insertId, 
-        message: "Class created successfully!" 
-    });
-  });
-};
 
 // ✅ Get all classes (with trainer name)
 exports.getAllClasses = (req, res) => {
@@ -63,10 +33,11 @@ exports.getClassById = (req, res) => {
   const { id } = req.params;
 
   const query = `
-    SELECT c.id, c.name, c.schedule_time, c.capacity, t.name AS trainer_name
-    FROM classes c
-    JOIN trainers t ON c.trainer_id = t.id
-    WHERE c.id = ?
+    SELECT c.id, c.name, c.schedule_time, c.capacity, u.full_name AS trainer_name
+FROM classes c
+JOIN users u ON c.trainer_user_id = u.id
+WHERE c.id = ?
+
   `;
 
   db.query(query, [id], (err, results) => {
@@ -83,61 +54,81 @@ exports.getClassById = (req, res) => {
   });
 };
 
-exports.updateClass = (req, res) => {
-  const { id } = req.params; // Class ID to update
-  // Destructure the new field name: trainer_user_id
-  const { name, trainer_user_id, schedule_time, capacity } = req.body;
+exports.getClassesByTrainerId = (req, res) => {
+  const trainerUserId = req.params.id;
 
-  // Basic validation
-  if (!name || !trainer_user_id || !schedule_time) {
-    return res.status(400).json({ message: "Missing required class fields." });
+  const query = `
+    SELECT id, name, schedule_time, capacity, created_at
+    FROM classes
+    WHERE trainer_user_id = ?
+    ORDER BY schedule_time DESC
+  `;
+
+  db.query(query, [trainerUserId], (err, results) => {
+    if (err) {
+      console.error("Error fetching classes by trainer ID:", err);
+      return res.status(500).json({ message: "Database error" });
+    }
+    res.json(results);
+  });
+};
+
+
+// Create class
+exports.createClass = (req, res) => {
+  const { name, schedule_time, capacity } = req.body;
+  const trainerUserId = req.user.id;
+
+  if (!name || !schedule_time) {
+    return res.status(400).json({ message: "Missing required fields" });
   }
 
-  // 🚨 IMPORTANT: The UPDATE query MUST use the new column name (trainer_user_id)
+  const query = `
+    INSERT INTO classes (name, trainer_user_id, schedule_time, capacity)
+    VALUES (?, ?, ?, ?)
+  `;
+  db.query(query, [name, trainerUserId, schedule_time, capacity || 20], (err, result) => {
+    if (err) return res.status(500).json({ message: "Database error" });
+    res.status(201).json({ id: result.insertId, message: "Class created" });
+  });
+};
+
+// Update class (only trainer who owns class)
+exports.updateClass = (req, res) => {
+  const { id } = req.params;
+  const { name, schedule_time, capacity } = req.body;
+  const trainerUserId = req.user.id;
+
   const query = `
     UPDATE classes 
-    SET 
-      name = ?, 
-      trainer_user_id = ?, 
-      schedule_time = ?, 
-      capacity = ?, 
-      updated_at = NOW()
-    WHERE id = ?
+    SET name = ?, schedule_time = ?, capacity = ?
+    WHERE id = ? AND trainer_user_id = ?
   `;
-  const values = [name, trainer_user_id, schedule_time, capacity || 20, id];
-
-  db.query(query, values, (err, result) => {
-    if (err) {
-      console.error("Error updating class:", err);
-       // Check for Foreign Key constraint violation
-       if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-         return res.status(409).json({ message: "Invalid Trainer ID or Trainer does not exist." });
-      }
-      return res.status(500).json({ message: "Database error during class update." });
-    }
-    
+  db.query(query, [name, schedule_time, capacity, id, trainerUserId], (err, result) => {
+    if (err) return res.status(500).json({ message: "Database error" });
     if (result.affectedRows === 0) {
-        return res.status(404).json({ message: "Class not found." });
+      return res.status(404).json({ message: "Class not found or not owned by you" });
     }
-    
-    res.status(200).json({ message: "Class updated successfully!" });
+    res.json({ message: "Class updated" });
   });
 };
 
-// ✅ Delete class
+// Delete class (only trainer who owns class)
 exports.deleteClass = (req, res) => {
   const { id } = req.params;
+  const trainerUserId = req.user.id;
 
-  db.query("DELETE FROM classes WHERE id = ?", [id], (err, result) => {
-    if (err) {
-      console.error("Error deleting class:", err);
-      return res.status(500).json({ message: "Database error", error: err });
-    }
-
+  const query = `
+    DELETE FROM classes WHERE id = ? AND trainer_user_id = ?
+  `;
+  db.query(query, [id, trainerUserId], (err, result) => {
+    if (err) return res.status(500).json({ message: "Database error" });
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Class not found." });
+      return res.status(404).json({ message: "Class not found or not owned by you" });
     }
-
-    res.status(200).json({ message: "Class deleted successfully." });
+    res.json({ message: "Class deleted" });
   });
 };
+
+
+

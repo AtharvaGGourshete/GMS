@@ -1,10 +1,33 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, Users, Settings, PanelLeft, Calendar, BicepsFlexed, Building2Icon } from "lucide-react"; // Added icons
+import { Home, Users, Settings, PanelLeft, Calendar, BicepsFlexed, Building2Icon, GitGraph } from "lucide-react"; // Added icons
+
+const BRAND_COLOR = "#F24423";
+const ACCENT_COLOR_B = "#000000";
+const getLinkClass = (path, currentPath) => {
+  const isActive = currentPath === path;
+  return `flex items-center p-3 text-base font-medium transition-colors duration-150 group border-2 border-transparent 
+          ${
+            isActive
+              ? `bg-[${BRAND_COLOR}] text-white shadow-md border-black`
+              : "text-gray-700 hover:bg-gray-100 hover:text-black"
+          }`;
+};
+
+const getMobileLinkClass = (path, currentPath) => {
+  const isActive = currentPath === path;
+  return `flex flex-col items-center justify-center p-2 text-xs transition-colors duration-150 
+          ${
+            isActive
+              ? `text-[${BRAND_COLOR}]`
+              : "text-gray-500 hover:text-gray-700"
+          }`;
+};
 
 const AdminDashboard = () => {
   // State for toggling the sidebar on smaller screens, if desired
   // const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
+  const currentPath = location.pathname;
 
   return (
     // Use 'flex' on the main container to lay out the sidebar and content
@@ -23,6 +46,13 @@ const AdminDashboard = () => {
         
         {/* Navigation */}
         <nav className="flex flex-col space-y-1">
+          <Link
+          to="/admin/dashboard"
+          className={getLinkClass("/admin/dashboard", currentPath)}
+        >
+          <GitGraph className="w-5 h-5 mr-3 " />
+          Analytics
+        </Link>
           <Link
             to="/admin/trainers"
             className="flex items-center p-3 rounded-lg text-base font-medium text-gray-700 hover:bg-[#F24423] hover:text-white transition-colors duration-150 group"

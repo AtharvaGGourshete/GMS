@@ -2,7 +2,7 @@ import api from "@/axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Link, useLocation } from "react-router-dom";
-import { BicepsFlexed, Users, Building2Icon, Calendar, X, Edit2, Trash2 } from 'lucide-react'; 
+import { BicepsFlexed, Users, Building2Icon, Calendar, X, Edit2, Trash2, GitGraph } from 'lucide-react'; 
 // NOTE: Removed the unused import: import { Input } from "@/components/ui/input";
 
 const BRAND_COLOR = "#F24423"; 
@@ -325,6 +325,13 @@ const AdminClasses = () => {
           </Link>
         </div>
         <nav className="flex flex-col space-y-1">
+          <Link
+          to="/admin/dashboard"
+          className={getLinkClass("/admin/dashboard", currentPath)}
+        >
+          <GitGraph className="w-5 h-5 mr-3 " />
+          Analytics
+        </Link>
           <Link to="/admin/trainers" className={getLinkClass("/admin/trainers", currentPath)}>
             <BicepsFlexed className="w-5 h-5 mr-3" />
             Trainers

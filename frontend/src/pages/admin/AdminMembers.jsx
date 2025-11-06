@@ -25,6 +25,7 @@ import {
   Search,
   Home,
   User,
+  GitGraph,
 } from "lucide-react";
 
 import {
@@ -314,6 +315,13 @@ const AdminMembers = () => {
         </Link>
       </div>
       <nav className="flex flex-col space-y-1">
+        <Link
+          to="/admin/dashboard"
+          className={getLinkClass("/admin/dashboard", currentPath)}
+        >
+          <GitGraph className="w-5 h-5 mr-3 " />
+          Analytics
+        </Link>
         <Link
           to="/admin/trainers"
           className={getLinkClass("/admin/trainers", currentPath)}

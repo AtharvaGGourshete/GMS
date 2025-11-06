@@ -17,6 +17,7 @@ import AboutUs from './pages/public_pages/AboutUs';
 import TrainerMembers from './pages/trainer/TrainerMembers';
 import TrainerClasses from './pages/trainer/TrainerClasses';
 import AdminLandingPage from './pages/admin/AdminLandingPage';
+import TrainerLanding from './pages/trainer/TrainerLanding';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
 
                     <Route element={<ProtectedRoute />}>
                         <Route path='/profile' element={<MemberProfile/>}/>
+                        
                         {/* Admin Pages */}
                         <Route path='/admin/landing' element={<AdminLandingPage/>}/>
                         <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
@@ -41,6 +43,7 @@ function App() {
                         <Route path="/admin/classes" element={<AdminClasses />} />
                         
                         {/* Trainer Pages */}
+                        <Route path='/trainer/landing' element={<TrainerLanding/>}/>
                         <Route path='/trainer/dashboard' element={<TrainerDashboard/>}/>
                         <Route path='/trainer/members' element={<TrainerMembers/>}/>
                         <Route path='/trainer/classes' element={<TrainerClasses/>}/>
