@@ -18,11 +18,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Auth routes
 app.post("/api/auth/register", register);
 app.post("/api/auth/login", login);
 
-// API routes
 app.use("/api/user", userRoutes);
 app.use("/api/membership", membershipRoutes);
 app.use("/api/attendance", attendanceRoutes);
@@ -32,7 +30,6 @@ app.use("/api/admin/classes", classRoutes);
 app.use("/api/trainer/classes", classRoutes)
 app.use("/api/plans", planRoutes);
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found", path: req.originalUrl });
 });

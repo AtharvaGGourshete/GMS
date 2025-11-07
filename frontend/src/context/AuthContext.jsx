@@ -5,9 +5,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // ✅ Loading state
-
-  // On app load, read from localStorage
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("access_token");
@@ -17,7 +15,7 @@ export const AuthProvider = ({ children }) => {
       setToken(storedToken);
     }
 
-    setIsLoading(false); // ✅ Done loading
+    setIsLoading(false);
   }, []);
 
   const login = (userData, token) => {

@@ -22,7 +22,6 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  // Neobrutalism link style
   const baseLinkClass = "font-bold uppercase tracking-wide text-black hover:text-[#F24423] cursor-pointer block py-3 px-4 text-center sm:text-left transition-colors duration-200 border-2 border-transparent hover:border-black hover:bg-yellow-300 sm:border-0 sm:hover:bg-transparent";
 
   const navLinks = (
@@ -69,16 +68,13 @@ const Navbar = () => {
           </div>
         
 
-        {/* Desktop Navigation Links */}
         <div className="hidden md:flex space-x-6 lg:space-x-8 items-center">
           {navLinks}
         </div>
         
-        {/* Auth Actions (Desktop) - Neobrutalism */}
         <div className='hidden md:flex items-center space-x-3'> 
           {user ? (
             <>
-              {/* Profile Link */}
               <Link 
                 to="/profile" 
                 className="p-3 border-4 border-black bg-white hover:bg-yellow-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
@@ -112,7 +108,6 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Menu Button - Neobrutalism */}
         <button 
           className="md:hidden p-3 border-4 border-black bg-white hover:bg-yellow-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus:outline-none"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -121,17 +116,14 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu Flyout - Neobrutalism */}
       <div 
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-t-4 border-black bg-cyan-50 ${
           isMenuOpen ? 'max-h-screen opacity-100 py-4' : 'max-h-0 opacity-0'
         }`}
       >
         <div className="flex flex-col space-y-3 px-4">
-          {/* Navigation Links */}
           {navLinks}
           
-          {/* Admin Link Button for Mobile */}
           {isAdmin && (
             <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
               <Button 
@@ -142,7 +134,6 @@ const Navbar = () => {
             </Link>
           )}
 
-          {/* Auth Actions (Mobile) */}
           <div className="flex flex-col space-y-3 pt-4 border-t-4 border-black">
             {user ? (
               <>

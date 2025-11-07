@@ -47,17 +47,14 @@ const getMembershipById = (req, res) => {
 
 const createMemberShip = async (req,res) => {
     try {
-        // 👈 CRITICAL CHANGE: Accept user_id from the request body
         const {user_id, full_name, email, phone, plan_id, join_date, expiry_date} = req.body; 
         
-        // Validate required fields for membership creation
         if(!user_id || !full_name || !email || !plan_id || !join_date || !expiry_date){
             return res.status(400).json({
                 message: "User ID, Full name, Email, Plan ID, Join Date, and Expiry Date are required for membership creation."
             })
         }
 
-        // NOTE: The 'members' table structure is assumed to map the fields provided in the query.
         const query = `INSERT INTO members (user_id, full_name, email, phone, plan_id, join_date, expiry_date) VALUES (?,?,?,?,?,?,?)`
 
         db.query(query,[user_id, full_name, email, phone || null , plan_id, join_date, expiry_date], (error, results) => {
@@ -78,14 +75,13 @@ const createMemberShip = async (req,res) => {
 }
 
 const updateMembershipByUserId = (req, res) => {
-    const { userId } = req.params; // The user ID comes from the URL
-    const { plan_id } = req.body; // The new plan ID comes from the request body
+    const { userId } = req.params;
+    const { plan_id } = req.body;
 
     if (!plan_id) {
         return res.status(400).json({ message: "Plan ID is required for membership update." });
     }
 
-    // 1. Fetch the selected plan's duration (needed to calculate new expiry date)
     const fetchPlanQuery = `SELECT duration_days FROM plans WHERE id = ?`;
 
     db.query(fetchPlanQuery, [plan_id], (err, planResults) => {
@@ -95,14 +91,12 @@ const updateMembershipByUserId = (req, res) => {
         }
 
         const durationDays = planResults[0].duration_days;
-        const joinDate = new Date().toISOString().split('T')[0]; // Today's date
+        const joinDate = new Date().toISOString().split('T')[0];
         
         const expiryDate = new Date();
         expiryDate.setDate(expiryDate.getDate() + parseInt(durationDays, 10));
         const newExpiryDate = expiryDate.toISOString().split('T')[0];
         
-        // 2. Update the existing membership record for this user
-        // NOTE: This assumes a user has AT MOST one current membership record in the 'members' table.
         const updateQuery = `
             UPDATE members 
             SET 
@@ -122,7 +116,6 @@ const updateMembershipByUserId = (req, res) => {
             }
 
             if (updateResults.affectedRows === 0) {
-                // If no existing membership was found, create a new one instead of failing the update.
                 const insertQuery = `
                     INSERT INTO members (user_id, plan_id, join_date, expiry_date, status)
                     VALUES (?, ?, ?, ?, 'active')

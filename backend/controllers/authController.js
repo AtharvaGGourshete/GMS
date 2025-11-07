@@ -63,7 +63,6 @@ const login = (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Create JWT token with role_id
     const token = jwt.sign(
       { 
         id: user.id, 
@@ -95,7 +94,6 @@ const login = (req, res) => {
   });
 };
 
-// JWT verification middleware
 const verifyJWT = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   
@@ -115,25 +113,18 @@ const verifyJWT = (req, res, next) => {
   }
 };
 
-// Role-based authorization middleware
 const verifyRole = (...allowedRoles) => {
   return (req, res, next) => {
     try {
-      console.log('🔍 User from JWT:', req.user);
-      console.log('✅ Allowed roles:', allowedRoles);
-      console.log('👤 User role_id:', req.user?.role_id);
-
       if (!req.user) {
         return res.status(401).json({ message: "Unauthorized. Token missing or invalid." });
       }
 
-      // Check if user's role matches any of the allowed roles
       if (allowedRoles.includes(req.user.role_id)) {
-        console.log('✅ Access granted');
+       
         return next();
       }
-
-      console.log('❌ Access denied');
+     
       return res.status(403).json({ 
         message: "Access denied. Insufficient privileges.",
         userRole: req.user.role_id,

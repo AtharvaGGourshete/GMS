@@ -7,7 +7,6 @@ const api = axios.create({
   },
 });
 
-// Add token to every request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access_token");
@@ -19,12 +18,10 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Optional: Add response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid - redirect to login
       localStorage.removeItem("access_token");
       window.location.href = "/login";
     }

@@ -1,8 +1,5 @@
 const db = require("../config/db");
 
-
-
-// ✅ Get all classes (with trainer name)
 exports.getAllClasses = (req, res) => {
   const query = `
     SELECT
@@ -28,7 +25,6 @@ exports.getAllClasses = (req, res) => {
   });
 };
 
-// ✅ Get class by ID
 exports.getClassById = (req, res) => {
   const { id } = req.params;
 
@@ -73,8 +69,6 @@ exports.getClassesByTrainerId = (req, res) => {
   });
 };
 
-
-// Create class
 exports.createClass = (req, res) => {
   const { name, schedule_time, capacity } = req.body;
   const trainerUserId = req.user.id;
@@ -93,7 +87,6 @@ exports.createClass = (req, res) => {
   });
 };
 
-// Update class (only trainer who owns class)
 exports.updateClass = (req, res) => {
   const { id } = req.params;
   const { name, schedule_time, capacity } = req.body;
@@ -113,7 +106,6 @@ exports.updateClass = (req, res) => {
   });
 };
 
-// Delete class (only trainer who owns class)
 exports.deleteClass = (req, res) => {
   const { id } = req.params;
   const trainerUserId = req.user.id;

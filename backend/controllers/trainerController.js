@@ -16,7 +16,7 @@ exports.createTrainer = async (req, res) => {
         return res.status(400).json({ message: "Email already exists." });
 
       const password_hash = await bcrypt.hash("default123", 10);
-      const role_id = 2; // trainer
+      const role_id = 2;
 
       db.query(
         "INSERT INTO users (full_name, email, password_hash, phone, role_id) VALUES (?, ?, ?, ?, ?)",
@@ -47,7 +47,6 @@ exports.createTrainer = async (req, res) => {
   }
 };
 
-// Get all trainers
 exports.getAllTrainers = (req, res) => {
   const query = `
     SELECT 
@@ -70,7 +69,6 @@ exports.getAllTrainers = (req, res) => {
   });
 };
 
-// Delete trainer
 exports.deleteTrainer = (req, res) => {
   const { id } = req.params;
   db.query("DELETE FROM trainers WHERE id = ?", [id], (err, result) => {

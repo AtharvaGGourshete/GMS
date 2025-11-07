@@ -1,9 +1,6 @@
-// controllers/planController.js
-
 const db = require("../config/db");
 
 const getAllPlans = (req, res) => {
-  // Assuming your plans table is named 'plans' and has 'id', 'name', 'duration_days', 'price'
   const query = `
     SELECT id, name, duration_days, price
     FROM plans
@@ -16,7 +13,6 @@ const getAllPlans = (req, res) => {
       return res.status(500).json({ message: "Database Error fetching plans.", error: err });
     }
 
-    // Return the plans data directly (as expected by the frontend fetchPlans function)
     res.status(200).json(results);
   });
 };

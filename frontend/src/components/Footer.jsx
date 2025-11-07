@@ -3,17 +3,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
-  // Neobrutalism hover class
   const hoverClass = "hover:text-[#F24423] hover:translate-x-1 transition-all duration-200 inline-block";
 
   return (
     <footer className="bg-black text-white py-16 border-t-8 border-[#F24423]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Top Section: Logo and Links */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-12 text-center md:text-left pb-12 mb-12 border-b-4 border-gray-700">
-
-          {/* Logo/Branding - Neobrutalism */}
           <div className="flex flex-col items-center md:items-start md:col-span-2">
             <Link to="/" aria-label="Gymie Home">
               <div className="flex items-center justify-center md:justify-start mb-4">
@@ -30,8 +25,6 @@ const Footer = () => {
               </p>
             </div>
           </div>
-
-          {/* Quick Links - Neobrutalism */}
           <nav className="mt-4 md:mt-0">
             <h3 className="text-2xl font-black uppercase mb-6 text-[#F24423] border-b-4 border-[#F24423] inline-block pb-1">
               Quick Links
@@ -44,7 +37,6 @@ const Footer = () => {
             </ul>
           </nav>
           
-          {/* Contact Info - Neobrutalism */}
           <div className="mt-4 md:mt-0">
             <h3 className="text-2xl font-black uppercase mb-6 text-[#F24423] border-b-4 border-[#F24423] inline-block pb-1">
               Get in Touch
@@ -66,10 +58,8 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Section: Copyright and Social Media */}
         <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left gap-6">
           
-          {/* Copyright - Neobrutalism */}
           <div className="order-2 sm:order-1">
             <div className="bg-white border-4 border-[#F24423] px-6 py-3 shadow-[4px_4px_0px_0px_rgba(242,68,35,1)] inline-block">
               <p className="text-sm font-black uppercase tracking-wide text-black">
@@ -78,7 +68,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Social Media Links - Neobrutalism */}
           <div className="order-1 sm:order-2">
             <div className="flex justify-center sm:justify-end gap-4">
               <a 

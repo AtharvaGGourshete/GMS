@@ -1,7 +1,6 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 
-// Get all users (members) with their latest membership info
 const getAllUsers = (req, res) => {
   const query = `
     SELECT 
@@ -43,7 +42,6 @@ const getAllUsers = (req, res) => {
   });
 };
 
-// Get user by ID
 const getUserById = (req, res) => {
   const { id } = req.params;
   const query = `SELECT id, full_name, email, phone FROM users WHERE id = ?`;
@@ -59,7 +57,6 @@ const getUserById = (req, res) => {
   });
 };
 
-// Update user
 const updateUser = (req, res) => {
   const { id } = req.params;
   const { full_name, email, phone } = req.body;
@@ -73,7 +70,6 @@ const updateUser = (req, res) => {
   });
 };
 
-// Delete user
 const deleteUser = (req, res) => {
   const { id } = req.params;
   const query = `DELETE FROM users WHERE id = ?`;
@@ -86,7 +82,6 @@ const deleteUser = (req, res) => {
   });
 };
 
-// Create user
 const createUser = async (req, res) => {
   try {
     const { full_name, email, phone, password } = req.body;
@@ -95,10 +90,7 @@ const createUser = async (req, res) => {
       return res.status(400).json({ message: "Full name, email, and password are required" });
     }
 
-    // Hash password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Default role_id = 3 (member)
     const role_id = 3;
 
     const query = `
@@ -123,7 +115,6 @@ const createUser = async (req, res) => {
   }
 };
 
-// Get user attendance
 const getUserAttendance = (req, res) => {
   const { id } = req.params;
   const query = `
