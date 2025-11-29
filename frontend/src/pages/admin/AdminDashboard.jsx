@@ -1,97 +1,98 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { Home, Users, Settings, PanelLeft, Calendar, BicepsFlexed, Building2Icon, GitGraph } from "lucide-react"; // Added icons
+import { Link, useLocation } from "react-router-dom";
+import {
+  Home,
+  Users,
+  Settings,
+  Calendar,
+  BicepsFlexed,
+  Building2Icon,
+  GitGraph
+} from "lucide-react";
 
-const BRAND_COLOR = "#F24423";
-const ACCENT_COLOR_B = "#000000";
-const getLinkClass = (path, currentPath) => {
-  const isActive = currentPath === path;
-  return `flex items-center p-3 text-base font-medium transition-colors duration-150 group border-2 border-transparent 
-          ${
-            isActive
-              ? `bg-[${BRAND_COLOR}] text-white shadow-md border-black`
-              : "text-gray-700 hover:bg-gray-100 hover:text-black"
-          }`;
-};
+const navItems = [
+  { label: "Analytics", icon: GitGraph, path: "/admin/dashboard" },
+  { label: "Trainers", icon: BicepsFlexed, path: "/admin/trainers" },
+  { label: "Members", icon: Users, path: "/admin/members" },
+  { label: "Classes", icon: Building2Icon, path: "/admin/classes" },
+];
 
-const getMobileLinkClass = (path, currentPath) => {
-  const isActive = currentPath === path;
-  return `flex flex-col items-center justify-center p-2 text-xs transition-colors duration-150 
-          ${
-            isActive
-              ? `text-[${BRAND_COLOR}]`
-              : "text-gray-500 hover:text-gray-700"
-          }`;
-};
-
-const AdminDashboard = () => {
-  // State for toggling the sidebar on smaller screens, if desired
-  // const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
-  const currentPath = location.pathname;
+export default function AdminDashboard() {
+  const location = useLocation();
+  const current = location.pathname;
 
   return (
-    // Use 'flex' on the main container to lay out the sidebar and content
-    <div className="flex min-h-screen bg-gray-50">
-      
-      {/* Sidebar - Use a consistent width and position/sticky */}
-      {/* For simplicity, this is desktop-first. Use conditional classes for mobile slide-out. */}
-      <aside className="hidden md:block w-64 text-gray-800 shadow-xl p-4 bg-white border-r"> 
-        
-        {/* Header/Title */}
-        <div className="flex items-center justify-center h-16 border-b mb-6">
-          <Link to="/admin" className="text-2xl font-extrabold text-[#F24423]">
-            Admin Panel
-          </Link>
-        </div>
-        
-        {/* Navigation */}
-        <nav className="flex flex-col space-y-1">
-          <Link
-          to="/admin/dashboard"
-          className={getLinkClass("/admin/dashboard", currentPath)}
+    <div className="flex min-h-screen bg-white">
+      {/* Sidebar */}
+      <aside className="hidden md:flex w-64 flex-col border-r bg-white px-6 mt-10">
+        <Link
+          to="/admin"
+          className="text-2xl font-semibold tracking-tight text-slate-900"
         >
-          <GitGraph className="w-5 h-5 mr-3 " />
-          Analytics
+          Admin Panel
         </Link>
-          <Link
-            to="/admin/trainers"
-            className="flex items-center p-3 rounded-lg text-base font-medium text-gray-700 hover:bg-[#F24423] hover:text-white transition-colors duration-150 group"
-          >
-            <BicepsFlexed className="w-5 h-5 mr-3 group-hover:text-white" />
-            Trainers
-          </Link>
 
-          <Link
-            to="/admin/members" // Changed to admin path for clarity
-            className="flex items-center p-3 rounded-lg text-base font-medium text-gray-700 hover:bg-[#F24423] hover:text-white transition-colors duration-150 group"
-          >
-            <Users className="w-5 h-5 mr-3 group-hover:text-white" />
-            Members
-          </Link>
+        <nav className="mt-10 flex flex-col gap-1">
+          {navItems.map((item, idx) => {
+            const Icon = item.icon;
+            const active = current === item.path;
 
-          <Link
-            to="/admin/classes" // Changed to admin path for clarity
-            className="flex items-center p-3 rounded-lg text-base font-medium text-gray-700 hover:bg-[#F24423] hover:text-white transition-colors duration-150 group"
-          >
-            <Building2Icon className="w-5 h-5 mr-3 group-hover:text-white" />
-            Classes
-          </Link>
+            return (
+              <Link
+                key={idx}
+                to={item.path}
+                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                  active
+                    ? "bg-slate-100 text-slate-900"
+                    : "text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <main className="flex-1 p-8">
-        {/* A place to render the specific admin view (e.g., Users, Settings) */}
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Welcome to the Dashboard!</h1>
-        <p className="text-gray-600">
-          This is the main content area where your administrative views will be displayed.
+        <h1 className="text-4xl font-semibold text-slate-900 tracking-tight mb-3">
+          Welcome to the Dashboard
+        </h1>
+        <p className="text-slate-600 mb-8">
+          This clean and minimal interface helps you manage your entire gym efficiently.
         </p>
-        
-        {/* Placeholder for content */}
-        {/* <Outlet /> */} 
+
+        {/* Analytics Placeholder */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition-all"
+            >
+              <p className="text-slate-500 text-sm font-medium mb-2">
+                Metric {i}
+              </p>
+              <p className="text-3xl font-semibold text-slate-800">
+                Coming Soon
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Section */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-semibold text-slate-900 mb-3">
+            System Overview
+          </h2>
+          <p className="text-slate-600 max-w-xl">
+            The Admin Dashboard will soon include detailed analytics, charts,
+            attendance tracking, revenue breakdown, and more — all in a clean,
+            minimal Apple-style UI.
+          </p>
+        </div>
       </main>
     </div>
   );
-};
-
-export default AdminDashboard;
+}

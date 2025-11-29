@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Menu, X, Shield } from "lucide-react";
-import { Button } from "./ui/button";
+import { useAuth } from "@/context/AuthContext";
+
+import { Menu, User, Shield, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "@/components/ui/sheet";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [loading] = useState(false);
-  
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -22,68 +23,59 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  const baseLinkClass = "font-bold uppercase tracking-wide text-black hover:text-[#F24423] cursor-pointer block py-3 px-4 text-center sm:text-left transition-colors duration-200 border-2 border-transparent hover:border-black hover:bg-yellow-300 sm:border-0 sm:hover:bg-transparent";
-
-  const navLinks = (
-    <>
-      {isAdmin && (
-        <Link 
-          to="/admin/trainers" 
-          onClick={() => setIsMenuOpen(false)} 
-          className="font-black uppercase tracking-wide cursor-pointer block py-3 px-4 text-center sm:text-left bg-green-300 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all mb-2 sm:mb-0"
-        >
-          Admin Dashboard
-        </Link>
-      )}
-
-      {isMember && (
-        <Link 
-          to="/trainer/members" 
-          onClick={() => setIsMenuOpen(false)} 
-          className="font-black uppercase tracking-wide cursor-pointer block py-3 px-4 text-center sm:text-left bg-cyan-300 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all mb-2 sm:mb-0"
-        >
-          Trainer Dashboard
-        </Link>
-      )}
-
-      <Link to="/membership-plans" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>
-        Memberships
-      </Link>
-      <Link to="/aboutus" onClick={() => setIsMenuOpen(false)} className={baseLinkClass}>
-        About Us
-      </Link>
-    </>
-  );
-
   return (
-    <nav className="border-b-8 border-black shadow-[0_8px_0px_0px_rgba(0,0,0,1)] sticky top-0 z-40 bg-white">
-      <div className="flex justify-between items-center h-20 px-4 max-w-7xl mx-auto">
+    <nav className="w-full flex justify-center mt-4 px-4">
+      {/* NAV CONTAINER */}
+      <div className="
+        bg-white text-black rounded-full 
+        flex items-center justify-between
+        px-6 py-3 w-full max-w-6xl 
+        shadow-xl
+      ">
         
-          <div className="flex items-center font-black text-3xl sm:text-4xl uppercase tracking-tighter ">
-            
-            <span className="text-black">Gym</span>
-            <span className="text-[#F24423] bg-yellow-300 px-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -rotate-2">
-              ie
-            </span>
-          </div>
-        
+        {/* LOGO */}
+        <Link to="/" className="flex items-center font-black text-xl tracking-tight">
+          <span className="text-black">Gym</span>
+          <span className="text-black bg-yellow-300 px-2 rounded-full ml-1">
+            ie
+          </span>
+        </Link>
 
-        <div className="hidden md:flex space-x-6 lg:space-x-8 items-center">
-          {navLinks}
+        {/* DESKTOP MENU */}
+        <div className="hidden md:flex items-center space-x-8 ml-8 text-sm font-semibold">
+          {isAdmin && (
+            <Link to="/admin/trainers" className="hover:text-gray-800">
+              Admin Dashboard
+            </Link>
+          )}
+
+          {isMember && (
+            <Link to="/trainer/members" className="hover:text-gray-800">
+              Trainer Dashboard
+            </Link>
+          )}
+
+          <Link to="/membership-plans" className="hover:text-gray-800">Memberships</Link>
+          <Link to="/aboutus" className="hover:text-gray-800">About Us</Link>
         </div>
-        
-        <div className='hidden md:flex items-center space-x-3'> 
+
+        {/* DESKTOP ACTIONS */}
+        <div className="hidden md:flex items-center space-x-3">
           {user ? (
             <>
-              <Link 
-                to="/profile" 
-                className="p-3 border-4 border-black bg-white hover:bg-yellow-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-              >
-                <User className="h-6 w-6 text-black"/>
+              <Link to="/profile">
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="rounded-full bg-white text-black hover:bg-neutral-200"
+                >
+                  <User className="h-5 w-5" />
+                </Button>
               </Link>
-              <Button 
-                onClick={handleLogout} 
-                className="bg-[#F24423] hover:bg-[#c9371f] text-white font-black uppercase tracking-wide border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-none cursor-pointer px-6 py-5"
+
+              <Button
+                onClick={handleLogout}
+                className="rounded-full bg-red-500 hover:bg-red-600 text-white"
               >
                 Logout
               </Button>
@@ -91,16 +83,13 @@ const Navbar = () => {
           ) : (
             <>
               <Link to="/login">
-                <Button 
-                  className='font-black uppercase tracking-wide cursor-pointer border-4 border-black bg-white text-black hover:bg-gray-100 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-none px-6 py-5'
-                >
+                <Button variant="secondary" className="rounded-full bg-white text-black hover:bg-neutral-200">
                   Login
                 </Button>
               </Link>
+
               <Link to="/register">
-                <Button 
-                  className="bg-[#F24423] hover:bg-[#c9371f] text-white font-black uppercase tracking-wide border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-none cursor-pointer px-6 py-5"
-                >
+                <Button className="rounded-full bg-red-500 hover:bg-red-600 text-white">
                   Sign Up
                 </Button>
               </Link>
@@ -108,69 +97,79 @@ const Navbar = () => {
           )}
         </div>
 
-        <button 
-          className="md:hidden p-3 border-4 border-black bg-white hover:bg-yellow-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus:outline-none"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X className="h-6 w-6 text-black" /> : <Menu className="h-6 w-6 text-black" />}
-        </button>
-      </div>
+        {/* MOBILE MENU (SHADCN SHEET) */}
+        <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+          <SheetTrigger asChild>
+            <Button
+              size="icon"
+              className="md:hidden bg-white text-black rounded-full hover:bg-neutral-200"
+            >
+              <Menu />
+            </Button>
+          </SheetTrigger>
 
-      <div 
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-t-4 border-black bg-cyan-50 ${
-          isMenuOpen ? 'max-h-screen opacity-100 py-4' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <div className="flex flex-col space-y-3 px-4">
-          {navLinks}
-          
-          {isAdmin && (
-            <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
-              <Button 
-                className="bg-green-300 hover:bg-green-400 text-black font-black uppercase w-full justify-start border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none"
-              >
-                <Shield className="mr-2 h-5 w-5"/> Admin Dashboard
-              </Button>
-            </Link>
-          )}
+          <SheetContent side="top" className="rounded-b-3xl bg-black text-white border-neutral-800">
+            <SheetHeader className="flex justify-between">
+              <span className="text-xl font-bold">Menu</span>
+              <X onClick={() => setIsMenuOpen(false)} className="cursor-pointer" />
+            </SheetHeader>
 
-          <div className="flex flex-col space-y-3 pt-4 border-t-4 border-black">
-            {user ? (
-              <>
-                <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
-                  <Button 
-                    className="w-full justify-start border-4 border-black bg-white hover:bg-yellow-300 text-black font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none"
-                  >
-                    <User className="mr-2 h-5 w-5"/> Profile
-                  </Button>
+            <div className="flex flex-col space-y-6 mt-6 text-lg">
+              {isAdmin && (
+                <Link to="/admin/trainers" onClick={() => setIsMenuOpen(false)} className="hover:text-yellow-300">
+                  <Shield className="inline-block mr-2" /> Admin Dashboard
                 </Link>
-                <Button 
-                  onClick={handleLogout} 
-                  className="bg-[#F24423] hover:bg-[#c9371f] text-white font-black uppercase cursor-pointer w-full border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none"
-                >
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button 
-                    className='cursor-pointer w-full border-4 border-black bg-white text-black hover:bg-gray-100 font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none'
-                  >
-                    Login
-                  </Button>
+              )}
+
+              {isMember && (
+                <Link to="/trainer/members" onClick={() => setIsMenuOpen(false)} className="hover:text-yellow-300">
+                  Trainer Dashboard
                 </Link>
-                <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  <Button 
-                    className="bg-[#F24423] hover:bg-[#c9371f] text-white font-black uppercase cursor-pointer w-full border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none"
-                  >
-                    Sign Up
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
+              )}
+
+              <Link to="/membership-plans" onClick={() => setIsMenuOpen(false)} className="hover:text-yellow-300">
+                Memberships
+              </Link>
+
+              <Link to="/aboutus" onClick={() => setIsMenuOpen(false)} className="hover:text-yellow-300">
+                About Us
+              </Link>
+
+              <div className="border-t border-neutral-700 pt-6">
+                {user ? (
+                  <>
+                    <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full rounded-full bg-white text-black hover:bg-neutral-200">
+                        <User className="mr-2" /> Profile
+                      </Button>
+                    </Link>
+
+                    <Button
+                      onClick={handleLogout}
+                      className="w-full rounded-full bg-red-500 hover:bg-red-600 text-white mt-3"
+                    >
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full rounded-full bg-white text-black hover:bg-neutral-200">
+                        Login
+                      </Button>
+                    </Link>
+
+                    <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full rounded-full bg-red-500 hover:bg-red-600 text-white mt-3">
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </nav>
   );

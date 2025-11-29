@@ -1,93 +1,92 @@
-import React from 'react'
-import { Award, Zap, Heart } from 'lucide-react';
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Check } from "lucide-react";
+import { Link } from "react-router-dom";
 
-// Define the neobrutalism palette
-const NEO_COLORS = {
-    BG: 'bg-yellow-50', // Light background
-    ACCENT: 'bg-red-500', // Primary action color
-    HIGHLIGHT: 'bg-yellow-400', // Secondary feature color
-    TEXT: 'text-black',
-    BORDER: 'border-black',
-    SHADOW: 'shadow-[8px_8px_0_0_#000]',
-    SHADOW_SM: 'shadow-[4px_4px_0_0_#000]',
-};
-
-const AboutUs = () => {
+export default function AboutUs() {
   return (
-    <div className={`min-h-screen ${NEO_COLORS.BG} p-8 md:p-16 font-sans`}>
-      
-      {/* 1. Header Block */}
-      <div className={`w-full max-w-4xl mx-auto mb-12 p-6 border-4 ${NEO_COLORS.BORDER} ${NEO_COLORS.SHADOW} ${NEO_COLORS.HIGHLIGHT}`}>
-        <h1 className={`text-5xl md:text-6xl font-extrabold ${NEO_COLORS.TEXT} uppercase border-b-8 ${NEO_COLORS.BORDER} pb-3 mb-4`}>
-          The Mission: Beyond Fitness
-        </h1>
-        <p className={`text-xl md:text-2xl font-medium ${NEO_COLORS.TEXT}`}>
-          We're not just a gym; we're a **bold statement**. We tear down conventional fitness barriers with high-intensity training, no-nonsense gear, and a **community forged in steel**.
-        </p>
-      </div>
-      
-      ---
-      
-      {/* 2. Core Value Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        
-        {/* Card 1: Power */}
-        <div className={`p-6 border-4 ${NEO_COLORS.BORDER} ${NEO_COLORS.SHADOW_SM} transition-transform duration-150 hover:translate-x-1 hover:translate-y-1 hover:shadow-[7px_7px_0_0_#000] bg-white`}>
-          <Zap className={`w-10 h-10 ${NEO_COLORS.TEXT} mb-3`} />
-          <h3 className={`text-2xl font-black ${NEO_COLORS.TEXT} mb-2`}>
-            Raw Power
-          </h3>
-          <p className="text-gray-700">
-            No fancy spa water, just heavy iron, brutal conditioning, and results you can't ignore. We celebrate the **effort**, not the aesthetics.
+    <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 py-16 px-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <header className="text-center mb-12">
+          <Badge className="mx-auto mb-4 bg-white/60 text-slate-700 border border-slate-100">
+            Our mission
+          </Badge>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
+            The Mission: Beyond Fitness
+          </h1>
+          <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+            We’re not just a gym — we’re a community and platform built for sustainable progress.
+            Training, coaching and tools designed so members and teams can focus on results.
           </p>
-          <div className={`mt-4 w-12 h-2 ${NEO_COLORS.ACCENT} border-2 ${NEO_COLORS.BORDER}`}></div>
+        </header>
+
+        {/* Core values */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {[
+            {
+              title: "Raw Power",
+              text:
+                "No shortcuts — focused work, consistent programming, and measurable progress.",
+              icon: <Check className="h-5 w-5 text-slate-700" />,
+            },
+            {
+              title: "Hard-Wired Excellence",
+              text:
+                "Certified coaches, data-driven plans and accountability built into every program.",
+              icon: <Check className="h-5 w-5 text-slate-700" />,
+            },
+            {
+              title: "Unbreakable Crew",
+              text:
+                "A supportive community where members push each other toward shared goals.",
+              icon: <Check className="h-5 w-5 text-slate-700" />,
+            },
+          ].map((item, idx) => (
+            <Card key={idx} className="rounded-2xl border border-slate-100 shadow-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="rounded-lg bg-slate-100 p-2">{item.icon}</div>
+                  <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
+                </div>
+                <p className="text-sm text-slate-600">{item.text}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Card 2: Excellence */}
-        <div className={`p-6 border-4 ${NEO_COLORS.BORDER} ${NEO_COLORS.SHADOW_SM} transition-transform duration-150 hover:translate-x-1 hover:translate-y-1 hover:shadow-[7px_7px_0_0_#000] ${NEO_COLORS.HIGHLIGHT}`}>
-          <Award className={`w-10 h-10 ${NEO_COLORS.TEXT} mb-3`} />
-          <h3 className={`text-2xl font-black ${NEO_COLORS.TEXT} mb-2`}>
-            Hard-Wired Excellence
-          </h3>
-          <p className="text-gray-700">
-            Our certified trainers are top-tier engineers of human performance. They deliver uncompromising guidance tailored to your absolute limits.
-          </p>
-          <div className={`mt-4 w-12 h-2 ${NEO_COLORS.ACCENT} border-2 ${NEO_COLORS.BORDER}`}></div>
-        </div>
+        {/* CTA */}
+        <div className="max-w-2xl mx-auto">
+          <Card className="rounded-3xl border border-slate-100 shadow-md">
+            <CardContent className="p-8 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
+                Ready to get started?
+              </h2>
+              <p className="text-slate-600 mb-6">
+                Claim a trial session and experience our coaching and community.
+              </p>
 
-        {/* Card 3: Community */}
-        <div className={`p-6 border-4 ${NEO_COLORS.BORDER} ${NEO_COLORS.SHADOW_SM} transition-transform duration-150 hover:translate-x-1 hover:translate-y-1 hover:shadow-[7px_7px_0_0_#000] bg-white`}>
-          <Heart className={`w-10 h-10 ${NEO_COLORS.ACCENT} mb-3`} />
-          <h3 className={`text-2xl font-black ${NEO_COLORS.TEXT} mb-2`}>
-            Unbreakable Crew
-          </h3>
-          <p className="text-gray-700">
-            Find your tribe. We are a collective of driven individuals pushing past the noise and forging **real connection** in the pursuit of strength.
-          </p>
-          <div className={`mt-4 w-12 h-2 ${NEO_COLORS.ACCENT} border-2 ${NEO_COLORS.BORDER}`}></div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/register" className="w-full sm:w-auto">
+                  <Button className="rounded-full px-6 py-3 shadow-sm" size="lg">
+                    Claim Trial
+                  </Button>
+                </Link>
+
+                <Link to="/membership-plans" className="w-full sm:w-auto">
+                  <Button variant="ghost" className="rounded-full px-6 py-3" size="lg">
+                    View Plans
+                  </Button>
+                </Link>
+              </div>
+
+              <p className="text-xs text-slate-500 mt-6">No credit card • 14 day trial</p>
+            </CardContent>
+          </Card>
         </div>
       </div>
-
-      ---
-
-      {/* 3. Call to Action Block */}
-      <div className={`max-w-4xl mx-auto mt-12 p-8 border-4 ${NEO_COLORS.BORDER} bg-white ${NEO_COLORS.SHADOW}`}>
-        <h2 className={`text-3xl font-extrabold ${NEO_COLORS.TEXT} mb-4`}>
-          READY TO INTERFACE?
-        </h2>
-        <p className="text-lg mb-6 text-gray-700">
-          Stop scrolling. Start lifting. Click the button below to claim your trial session and see the blueprint for your strongest self.
-        </p>
-        <button 
-          className={`px-8 py-3 text-lg font-bold uppercase border-4 ${NEO_COLORS.BORDER} ${NEO_COLORS.ACCENT} text-white ${NEO_COLORS.SHADOW_SM} 
-                      transition-all duration-150 hover:shadow-[6px_6px_0_0_#000] hover:bg-red-600`}
-        >
-          JOIN THE REVOLUTION &rarr;
-        </button>
-      </div>
-
-    </div>
+    </main>
   );
 }
-
-export default AboutUs;

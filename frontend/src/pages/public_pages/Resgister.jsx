@@ -1,233 +1,140 @@
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import api from '@/axios';
-import { useNavigate, Link } from 'react-router-dom';
-import { Loader2, UserPlus, User, Mail, Phone, Lock, ArrowRight } from 'lucide-react';
-import { toast } from 'sonner';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate, Link } from "react-router-dom";
+import api from "@/axios";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function RegisterForm() {
-    const navigate = useNavigate();
-    const form = useForm({
-        defaultValues: { full_name: '', email: '', password: '', confirmPassword: '', phone: '' },
-    });
-    const { isSubmitting } = form.formState;
-    
-    const onSubmit = async (values) => {
-        if (values.password !== values.confirmPassword) {
-            form.setError('confirmPassword', {
-                type: 'manual',
-                message: 'Passwords do not match.',
-            });
-            return;
-        }
+  const navigate = useNavigate();
+  const form = useForm({ defaultValues: { full_name: "", email: "", password: "", confirmPassword: "", phone: "" } });
+  const { handleSubmit, control, setError, formState: { isSubmitting } } = form;
 
-        try {
-            const dataToSend = {
-                full_name: values.full_name,
-                email: values.email,
-                password: values.password, 
-                phone: values.phone || null, 
-            };
+  const onSubmit = async (values) => {
+    // simple validation
+    if (values.password !== values.confirmPassword) {
+      setError("confirmPassword", { type: "manual", message: "Passwords do not match" });
+      return;
+    }
 
-            const response = await api.post('/auth/register', dataToSend);
-            
-            console.log("Registration successful:", response.data.message);
-            toast.success("Registration successful!");
-            navigate('/login'); 
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || "Registration failed. Please try again.";
-            console.error("Registration failed:", errorMessage);
-            toast.error(errorMessage);
-            form.setError('email', { message: errorMessage });
-        }
-    };
+    try {
+      const payload = {
+        full_name: values.full_name,
+        email: values.email,
+        password: values.password,
+        phone: values.phone || null,
+      };
 
-    return (
-        <div className="flex justify-center items-center min-h-screen p-4 bg-gradient-to-br from-pink-100 via-yellow-50 to-cyan-100 relative overflow-hidden mb-20">
-            {/* Decorative background elements */}
-            <div className="absolute top-10 right-10 w-32 h-32 border-8 border-black opacity-20 rotate-12"></div>
-            <div className="absolute bottom-10 left-10 w-40 h-40 bg-cyan-300 border-8 border-black opacity-30 rotate-45"></div>
-            <div className="absolute top-1/3 left-1/4 w-24 h-24 bg-yellow-300 border-4 border-black opacity-20"></div>
+      await api.post("/auth/register", payload);
+      toast.success("Account created");
+      navigate("/login");
+    } catch (err) {
+      const msg = err.response?.data?.message || "Registration failed";
+      toast.error(msg);
+      setError("email", { type: "server", message: msg });
+    }
+  };
 
-            <Card className="w-full max-w-lg border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white rounded-none relative z-10">
-                {/* Decorative corners */}
-                <div className="absolute -top-4 -right-4 w-12 h-12 bg-yellow-300 border-4 border-black"></div>
-                <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-pink-300 border-4 border-black"></div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-white to-slate-50 flex items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-lg rounded-2xl border border-slate-100 shadow-md">
+        <CardHeader className="p-6 text-center">
+          <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
+          <p className="text-sm text-slate-600 mt-2">Start your 14-day trial — no credit card required</p>
+        </CardHeader>
 
-                <CardHeader className="border-b-4 border-black pb-6">
-                    <div className="flex items-center justify-center mb-4">
-                        <div className="p-4 bg-green-300 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                            <UserPlus className="h-8 w-8 text-black" />
-                        </div>
-                    </div>
-                    <CardTitle className="text-4xl font-black uppercase text-center tracking-tight">
-                        Join <span className="text-[#F24423]">Gymie</span>
-                    </CardTitle>
-                    <p className="text-center font-bold uppercase tracking-wide text-sm mt-2">
-                        Create Your Fitness Account
-                    </p>
-                </CardHeader>
+        <CardContent className="p-6">
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={control}
+                name="full_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Jane Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <CardContent className="pt-6">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                            
-                            {/* Full Name */}
-                            <FormField
-                                control={form.control}
-                                name="full_name" 
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="font-black uppercase tracking-wide text-sm flex items-center gap-2">
-                                            <User className="h-4 w-4" />
-                                            Full Name
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                placeholder="John Doe" 
-                                                {...field} 
-                                                disabled={isSubmitting}
-                                                className="h-12 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-x-[2px] focus:translate-y-[2px] transition-all rounded-none font-bold"
-                                            />
-                                        </FormControl>
-                                        <FormMessage className="font-bold text-xs mt-2" />
-                                    </FormItem>
-                                )}
-                            />
+              <FormField
+                control={control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="you@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                            {/* Email */}
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="font-black uppercase tracking-wide text-sm flex items-center gap-2">
-                                            <Mail className="h-4 w-4" />
-                                            Email Address
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                placeholder="you@example.com" 
-                                                type="email" 
-                                                {...field} 
-                                                disabled={isSubmitting}
-                                                className="h-12 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-x-[2px] focus:translate-y-[2px] transition-all rounded-none font-bold"
-                                            />
-                                        </FormControl>
-                                        <FormMessage className="font-bold text-xs mt-2" />
-                                    </FormItem>
-                                )}
-                            />
+              <FormField
+                control={control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone (optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="123-456-7890" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                            {/* Phone */}
-                            <FormField
-                                control={form.control}
-                                name="phone" 
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="font-black uppercase tracking-wide text-sm flex items-center gap-2">
-                                            <Phone className="h-4 w-4" />
-                                            Phone (Optional)
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                placeholder="123-456-7890" 
-                                                {...field} 
-                                                disabled={isSubmitting}
-                                                className="h-12 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-x-[2px] focus:translate-y-[2px] transition-all rounded-none font-bold"
-                                            />
-                                        </FormControl>
-                                        <FormMessage className="font-bold text-xs mt-2" />
-                                    </FormItem>
-                                )}
-                            />
+              <FormField
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                            {/* Password */}
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="font-black uppercase tracking-wide text-sm flex items-center gap-2">
-                                            <Lock className="h-4 w-4" />
-                                            Password
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                type="password" 
-                                                placeholder="••••••••" 
-                                                {...field} 
-                                                disabled={isSubmitting}
-                                                className="h-12 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-x-[2px] focus:translate-y-[2px] transition-all rounded-none font-bold"
-                                            />
-                                        </FormControl>
-                                        <FormMessage className="font-bold text-xs mt-2" />
-                                    </FormItem>
-                                )}
-                            />
+              <FormField
+                control={control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                            {/* Confirm Password */}
-                            <FormField
-                                control={form.control}
-                                name="confirmPassword"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="font-black uppercase tracking-wide text-sm flex items-center gap-2">
-                                            <Lock className="h-4 w-4" />
-                                            Confirm Password
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input 
-                                                type="password" 
-                                                placeholder="••••••••" 
-                                                {...field} 
-                                                disabled={isSubmitting}
-                                                className="h-12 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-x-[2px] focus:translate-y-[2px] transition-all rounded-none font-bold"
-                                            />
-                                        </FormControl>
-                                        <FormMessage className="font-bold text-xs mt-2" />
-                                    </FormItem>
-                                )}
-                            />
+              <Button type="submit" className="w-full rounded-full py-3" disabled={isSubmitting}>
+                {isSubmitting ? "Creating account..." : "Create Account"}
+              </Button>
+            </form>
+          </Form>
 
-                            {/* Submit Button */}
-                            <Button 
-                                type="submit" 
-                                className="w-full h-14 text-lg font-black uppercase tracking-wider bg-[#F24423] text-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-none mt-6" 
-                                disabled={isSubmitting}
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" /> 
-                                        Creating Account...
-                                    </>
-                                ) : (
-                                    <>
-                                        Create Account
-                                        <ArrowRight className="ml-2 h-5 w-5" />
-                                    </>
-                                )}
-                            </Button>
-                        </form>
-                    </Form>
-
-                    {/* Login Link */}
-                    <div className="mt-6 bg-cyan-300 border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center">
-                        <p className="text-sm font-bold uppercase tracking-wide text-black">
-                            Already have an account?{' '}
-                            <Link 
-                                to="/login" 
-                                className="text-[#F24423] hover:underline decoration-4 font-black"
-                            >
-                                Sign In
-                            </Link>
-                        </p>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    );
+          <div className="mt-4 text-center">
+            <p className="text-sm text-slate-600">
+              Already have an account?{" "}
+              <Link to="/login" className="text-slate-900 font-medium underline">
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

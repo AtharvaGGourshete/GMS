@@ -2,20 +2,22 @@ import api from "@/axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Link, useLocation } from "react-router-dom";
-import { BicepsFlexed, Users, Building2Icon, Calendar, X, Edit2, Trash2, GitGraph } from 'lucide-react'; 
+import { BicepsFlexed, Users, Building2Icon, Calendar, X, Edit2, Trash2, GitGraph, Home } from 'lucide-react'; 
 // NOTE: Removed the unused import: import { Input } from "@/components/ui/input";
 
-const BRAND_COLOR = "#F24423"; 
-// Link Class Helpers (retained as provided)
-const getLinkClass = (path, currentPath) => {
-  const isActive = currentPath === path;
-  return `flex items-center p-3 text-base font-medium transition-colors duration-150 group border-2 border-transparent 
-          ${
-            isActive
-              ? `bg-[${BRAND_COLOR}] text-white shadow-md border-black`
-              : "text-gray-700 hover:bg-gray-100 hover:text-black"
-          }`;
-};
+// --- Minimal UI helpers (pure visual changes only) ---
+const sidebarLink = (path, currentPath) =>
+  `flex items-center gap-3 px-4 py-2 rounded-xl text-sm transition 
+   ${
+     currentPath === path
+       ? "bg-slate-900 text-white"
+       : "text-slate-600 hover:bg-slate-50"
+   }`;
+
+const mobileLink = (path, currentPath) =>
+  `flex flex-col items-center justify-center text-xs ${
+    currentPath === path ? "text-slate-900 font-semibold" : "text-slate-500"
+  }`;
 
 const AdminClasses = () => {
   const [classes, setClasses] = useState([]);
@@ -68,6 +70,7 @@ const AdminClasses = () => {
         schedule_time: scheduleTimeFormatted,
         capacity: cls.capacity
     });
+    setIsAddModalOpen(true);
   };
 
   const openAddModal = () => {
@@ -133,60 +136,61 @@ const AdminClasses = () => {
     }
   };
 
-  // --- UI Render Functions (UNCHANGED) ---
+  // --- UI Render Functions (UNCHANGED content, only styling changed) ---
 
   const renderContent = () => {
     if (loading) {
       return (
         <div className="flex justify-center items-center h-48">
-            <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 rounded-full border-slate-200 border-t-slate-400 animate-spin"></div>
         </div>
       );
     }
 
     if (classes.length === 0) {
       return (
-        <div className="border-4 border-black p-6 bg-yellow-100 shadow-[4px_4px_0_0_#000]">
-          <p className="font-bold text-lg">No classes found in the database.</p>
-          <p className="text-sm mt-1">Please ensure the database contains class data linked to users with role_id = 2.</p>
+        <div className="rounded-lg border border-slate-200 p-6 bg-slate-50 shadow-sm">
+          <p className="font-semibold text-lg text-slate-900">No classes found in the database.</p>
+          <p className="text-sm mt-1 text-slate-600">Please ensure the database contains class data linked to users with role_id = 2.</p>
         </div>
       );
     }
     
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {classes.map((cls) => (
           <div
             key={cls.id}
-            className="border-4 border-black p-5 bg-white shadow-[8px_8px_0_0_#000] transition-all duration-100 hover:shadow-[10px_10px_0_0_#000]"
+            className="rounded-2xl border bg-white p-5 shadow-sm hover:shadow-md transition"
           >
             <div className="flex justify-between items-start">
-                <h2 className="font-extrabold text-xl text-black mb-3 border-b-2 border-black pb-1 pr-4">
+                <h2 className="font-semibold text-lg text-slate-900 mb-2">
                   {cls.name}
                 </h2>
                 <button 
                     onClick={() => openEditModal(cls)}
-                    className={`p-1 bg-yellow-400 border-2 border-black shadow-[2px_2px_0_0_#000] hover:bg-yellow-500 transition-colors duration-100 flex-shrink-0`}
+                    className="p-1 bg-slate-100 rounded-md hover:bg-slate-200 transition"
+                    title="Edit class"
                 >
-                    <Edit2 className="w-4 h-4 text-black" />
+                    <Edit2 className="w-4 h-4 text-slate-700" />
                 </button>
             </div>
             
-            <div className="space-y-2 text-sm pt-2">
+            <div className="space-y-2 text-sm pt-2 text-slate-700">
                 <p>
-                    <strong className="font-bold text-gray-800">Trainer:</strong> {cls.trainer_name || "Unassigned"}
+                    <strong className="font-medium text-slate-900">Trainer:</strong> {cls.trainer_name || "Unassigned"}
                 </p>
                 <p>
-                    <strong className="font-bold text-gray-800">Time:</strong>{" "}
-                    {new Date(cls.schedule_time).toLocaleString('en-US', {
+                    <strong className="font-medium text-slate-900">Time:</strong>{" "}
+                    {cls.schedule_time ? new Date(cls.schedule_time).toLocaleString('en-US', {
                         month: 'short',
                         day: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit'
-                    })}
+                    }) : 'TBD'}
                 </p>
                 <p>
-                    <strong className="font-bold text-gray-800">Capacity:</strong> {cls.capacity} people
+                    <strong className="font-medium text-slate-900">Capacity:</strong> {cls.capacity} people
                 </p>
             </div>
           </div>
@@ -195,17 +199,17 @@ const AdminClasses = () => {
     );
   };
   
-  // --- Class Form Dialog (Custom Modal for Data Entry) ---
+  // --- Class Form Dialog (UI only changed) ---
   const ClassFormDialog = ({ isEditing }) => {
     if (!isAddModalOpen && !editingClass) return null;
     
     const title = isEditing ? "Edit Class" : "Add New Class";
     const submitHandler = isEditing ? handleEditSubmit : handleAddSubmit;
-    const buttonText = isEditing ? "SAVE CHANGES" : "CREATE CLASS";
+    const buttonText = isEditing ? "Save Changes" : "Create Class";
 
-    // 💡 Using 'inputClass' for the HTML input element's className
-    const inputClass = "w-full p-3 border-2 border-black bg-white shadow-[2px_2px_0_0_#000] focus:shadow-[4px_4px_0_0_#000] transition-all duration-100 mb-4";
-    const labelClass = "block text-sm font-bold text-black mb-1";
+    // Gentle input styling for minimal UI
+    const inputClass = "w-full p-3 border rounded-lg bg-white border-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-300 mb-4";
+    const labelClass = "block text-sm font-medium text-slate-800 mb-1";
     
     // Key ensures React treats the form as a new instance, preventing stale state/focus issues
     const dialogKey = isEditing ? `edit-${editingClass.id}` : 'add-new';
@@ -213,45 +217,42 @@ const AdminClasses = () => {
     return (
       <div 
         key={dialogKey} 
-        className="fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center p-4"
+        className="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center p-4"
       >
-        <div className="bg-white border-4 border-black shadow-[10px_10px_0_0_#000] w-full max-w-lg p-6 relative">
+        <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-lg relative">
           
           <button
             onClick={closeModals}
-            className="absolute top-3 right-3 p-2 bg-red-500 border-2 border-black text-white hover:bg-red-600 shadow-[2px_2px_0_0_#000]"
+            className="absolute top-4 right-4 p-2 rounded-md bg-slate-100 hover:bg-slate-200"
+            aria-label="Close dialog"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 text-slate-700" />
           </button>
 
-          <h2 className="text-2xl font-extrabold mb-6 border-b-4 border-black pb-2">{title}</h2>
+          <h2 className="text-2xl font-semibold mb-4">{title}</h2>
           
           <form onSubmit={submitHandler}>
-            <div className="mb-4">
+            <div className="mb-3">
               <label htmlFor="name" className={labelClass}>Class Name</label>
-              {/* 🔄 Replaced <Input> with native <input> */}
               <input type="text" name="name" id="name" value={form.name} onChange={handleChange} className={inputClass} required />
             </div>
 
-            <div className="mb-4">
+            <div className="mb-3">
               <label htmlFor="trainer_user_id" className={labelClass}>Trainer User ID (Role 2)</label>
-              {/* 🔄 Replaced <Input> with native <input> */}
               <input type="number" name="trainer_user_id" id="trainer_user_id" value={form.trainer_user_id} onChange={handleChange} className={inputClass} required />
             </div>
 
-            <div className="mb-4">
+            <div className="mb-3">
               <label htmlFor="schedule_time" className={labelClass}>Schedule Time</label>
-              {/* 🔄 Replaced <Input> with native <input> */}
               <input type="datetime-local" name="schedule_time" id="schedule_time" value={form.schedule_time} onChange={handleChange} className={inputClass} required />
             </div>
 
-            <div className="mb-6">
+            <div className="mb-4">
               <label htmlFor="capacity" className={labelClass}>Capacity</label>
-              {/* 🔄 Replaced <Input> with native <input> */}
               <input type="number" name="capacity" id="capacity" value={form.capacity} onChange={handleChange} className={inputClass} min="1" required />
             </div>
             
-            <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+            <div className="flex items-center gap-3 mt-4">
                 {isEditing && (
                     <button
                         type="button"
@@ -259,14 +260,14 @@ const AdminClasses = () => {
                             setClassToDelete(editingClass); // Set class for deletion
                             closeModals(); // Close the edit form
                         }}
-                        className={`bg-red-500 text-white border-4 border-black px-4 py-2 font-bold shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:shadow-[6px_6px_0_0_#000] flex items-center text-sm`}
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700"
                     >
-                        <Trash2 className="w-4 h-4 mr-2" /> DELETE
+                        <Trash2 className="inline-block w-4 h-4 mr-2 align-middle" /> Delete
                     </button>
                 )}
                 <button
                     type="submit"
-                    className={`bg-blue-500 text-white border-4 border-black px-6 py-3 font-bold shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:shadow-[6px_6px_0_0_#000] hover:bg-blue-600 ${isEditing ? 'ml-auto' : 'w-full'}`}
+                    className={`ml-auto bg-slate-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-slate-800`}
                 >
                     {buttonText}
                 </button>
@@ -277,29 +278,27 @@ const AdminClasses = () => {
     );
   };
   
-  // --- AlertDialog for Deletion Confirmation (UNCHANGED) ---
+  // --- Delete confirmation dialog (UI only) ---
   const DeleteClassAlertDialog = () => {
     if (!classToDelete) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center p-4">
-        <div className="bg-white border-4 border-black shadow-[10px_10px_0_0_#000] w-full max-w-sm p-6 relative text-center">
-            <h3 className="text-xl font-extrabold text-red-600 mb-4 border-b-4 border-black pb-2">
-                CONFIRM DELETION
-            </h3>
-            <p className="mb-6 text-gray-700">
-                Are you sure you want to delete the class **{classToDelete.name}**? This action cannot be undone.
+      <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center p-4">
+        <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-lg text-center">
+            <h3 className="text-lg font-semibold text-red-600 mb-3">Confirm deletion</h3>
+            <p className="mb-6 text-slate-700">
+                Are you sure you want to delete the class <strong>{classToDelete.name}</strong>? This action cannot be undone.
             </p>
-            <div className="flex justify-between space-x-4">
+            <div className="flex gap-3">
                 <button
                     onClick={() => setClassToDelete(null)}
-                    className="flex-1 bg-gray-300 text-black border-2 border-black px-4 py-2 font-bold shadow-[4px_4px_0_0_#000] hover:bg-gray-400"
+                    className="flex-1 bg-slate-100 text-slate-800 px-4 py-2 rounded-lg"
                 >
                     Cancel
                 </button>
                 <button
                     onClick={handleDelete}
-                    className="flex-1 bg-red-600 text-white border-2 border-black px-4 py-2 font-bold shadow-[4px_4px_0_0_#000] hover:bg-red-700"
+                    className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg"
                 >
                     Yes, Delete
                 </button>
@@ -310,57 +309,54 @@ const AdminClasses = () => {
   };
 
 
-  // --- Main Component Structure (UNCHANGED) ---
+  // --- Main Component Structure (UNCHANGED behavior, UI only) ---
+  const isMobile = window.innerWidth < 768;
+
   return (
-    <div className="flex bg-gray-100 min-h-screen">
+    <div className="flex bg-white min-h-screen">
       
-      {/* 1. SIDEBAR */}
-      <aside className="hidden md:block w-64 text-gray-800 shadow-2xl p-4 bg-white border-r sticky top-0 h-screen">
-        <div className="flex items-center justify-center h-16 border-b mb-6">
-          <Link
-            to="/admin"
-            className={`text-2xl font-extrabold text-[${BRAND_COLOR}]`}
-          >
-            Admin Panel
+      {/* 1. SIDEBAR (pure white minimal) */}
+      <aside className="hidden md:flex w-64 flex-col border-r bg-white px-6 mt-10">
+        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+          Admin Panel
+        </h2>
+
+        <nav className="flex flex-col space-y-2 mt-6">
+          <Link to="/admin/dashboard" className={sidebarLink("/admin/dashboard", currentPath)}>
+            <GitGraph className="w-5 h-5" />
+            Analytics
           </Link>
-        </div>
-        <nav className="flex flex-col space-y-1">
-          <Link
-          to="/admin/dashboard"
-          className={getLinkClass("/admin/dashboard", currentPath)}
-        >
-          <GitGraph className="w-5 h-5 mr-3 " />
-          Analytics
-        </Link>
-          <Link to="/admin/trainers" className={getLinkClass("/admin/trainers", currentPath)}>
-            <BicepsFlexed className="w-5 h-5 mr-3" />
+
+          <Link to="/admin/trainers" className={sidebarLink("/admin/trainers", currentPath)}>
+            <BicepsFlexed className="w-5 h-5" />
             Trainers
           </Link>
-          <Link to="/admin/members" className={getLinkClass("/admin/members", currentPath)}>
-            <Users
-              className={`w-5 h-5 mr-3 ${currentPath === "/admin/members" ? "text-white" : "text-gray-600 "}`}
-            />
+
+          <Link to="/admin/members" className={sidebarLink("/admin/members", currentPath)}>
+            <Users className="w-5 h-5" />
             Members
           </Link>
-          <Link to="/admin/classes" className={getLinkClass("/admin/classes", currentPath)}>
-            <Building2Icon className="w-5 h-5 mr-3" />
+
+          <Link to="/admin/classes" className={sidebarLink("/admin/classes", currentPath)}>
+            <Building2Icon className="w-5 h-5" />
             Classes
           </Link>
-          
         </nav>
       </aside>
 
       {/* 2. MAIN CONTENT AREA */}
-      <main className="flex-1 p-8 md:p-12">
-        <div className="flex justify-between items-center mb-10 pb-4 border-b-4 border-black">
-            <h1 className="text-4xl font-extrabold text-black">
-                Class Schedule
-            </h1>
+      <main className="flex-1 p-6 md:p-10">
+        <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-semibold text-slate-900">Class Schedule</h1>
+              <p className="text-slate-600 mt-1">Create, edit and schedule classes for your trainers.</p>
+            </div>
+
             <button
                 onClick={openAddModal}
-                className={`bg-green-400 text-black border-4 border-black px-6 py-2 font-bold shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:shadow-[6px_6px_0_0_#000]`}
+                className="bg-slate-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-slate-800"
             >
-                + ADD NEW CLASS
+                + Add Class
             </button>
         </div>
 
@@ -371,6 +367,36 @@ const AdminClasses = () => {
       {/* 3. MODALS/DIALOGS */}
       <ClassFormDialog isEditing={!!editingClass} />
       <DeleteClassAlertDialog />
+
+      {/* Mobile bottom nav */}
+      {isMobile && (
+        <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t flex justify-around items-center md:hidden shadow-sm">
+          <Link to="/admin" className={mobileLink("/admin", currentPath)}>
+            <Home className="w-5 h-5" />
+            <span className="text-xs">Dashboard</span>
+          </Link>
+
+          <Link to="/admin/trainers" className={mobileLink("/admin/trainers", currentPath)}>
+            <BicepsFlexed className="w-5 h-5" />
+            <span className="text-xs">Trainers</span>
+          </Link>
+
+          <Link to="/admin/members" className={mobileLink("/admin/members", currentPath)}>
+            <Users className="w-5 h-5" />
+            <span className="text-xs">Members</span>
+          </Link>
+
+          <Link to="/admin/classes" className={mobileLink("/admin/classes", currentPath)}>
+            <Building2Icon className="w-5 h-5" />
+            <span className="text-xs">Classes</span>
+          </Link>
+
+          <Link to="/admin/attendance" className={mobileLink("/admin/attendance", currentPath)}>
+            <Calendar className="w-5 h-5" />
+            <span className="text-xs">Attendance</span>
+          </Link>
+        </nav>
+      )}
     </div>
   );
 };

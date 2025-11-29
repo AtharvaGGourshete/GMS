@@ -8,13 +8,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Phone, CalendarDays, User, LogOut, Package } from "lucide-react"; 
+import {
+  Mail,
+  Phone,
+  CalendarDays,
+  LogOut,
+  Package,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import api from "@/axios"; 
-
-const BRAND_COLOR = "#F24423";
-const ACCENT_COLOR_B = "#000000"; 
+import api from "@/axios";
 
 const MemberProfile = () => {
   const { user, logout } = useAuth();
@@ -28,11 +31,7 @@ const MemberProfile = () => {
       if (user && user.id) {
         try {
           const response = await api.get(`/membership/user/${user.id}`);
-          if (response.data && response.data.length > 0) {
-            setMembershipDetails(response.data[0]);
-          } else {
-            setMembershipDetails(null);
-          }
+          setMembershipDetails(response.data?.[0] || null);
         } catch (error) {
           console.error("Error fetching membership details:", error);
           setMembershipDetails(null);
@@ -40,32 +39,22 @@ const MemberProfile = () => {
           setLoadingMembership(false);
         }
       } else {
-        setLoadingMembership(false); 
+        setLoadingMembership(false);
       }
     };
     fetchMembership();
   }, [user]);
 
-
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <Card 
-          className="p-8 text-center border-4 border-black"
-          style={{boxShadow: `8px 8px 0 0 ${BRAND_COLOR}`}}
-        >
+        <Card className="p-8 text-center shadow-lg rounded-2xl border border-gray-200">
           <p className="text-xl font-semibold text-gray-800">
             Please log in to view your profile.
           </p>
-          <Button 
-            onClick={() => navigate('/login')} 
-            className="mt-6 font-bold uppercase"
-            style={{
-                backgroundColor: BRAND_COLOR,
-                color: 'white',
-                border: `2px solid ${ACCENT_COLOR_B}`,
-                boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
-            }}
+          <Button
+            onClick={() => navigate("/login")}
+            className="mt-6"
           >
             Go to Login
           </Button>
@@ -76,8 +65,7 @@ const MemberProfile = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -85,7 +73,7 @@ const MemberProfile = () => {
   };
 
   const profileData = {
-    name: user.full_name || user.name, 
+    name: user.full_name || user.name,
     email: user.email,
     phone: user.phone || "Not provided",
     joined: user.created_at ? formatDate(user.created_at) : "N/A",
@@ -98,131 +86,144 @@ const MemberProfile = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8 flex items-center justify-center">
-      <div className="max-w-4xl w-full">
-        <h1 className="text-4xl md:text-5xl font-extrabold uppercase tracking-widest mb-8 text-black text-center">
-          <span className="inline-block p-2 border-b-4 border-black pb-2">
-            My Account Dashboard
-          </span>
+      <div className="max-w-4xl w-full space-y-8">
+
+        {/* Page Title */}
+        <h1 className="text-4xl md:text-5xl font-semibold text-center text-gray-900">
+          My Account
         </h1>
 
-        <Card 
-          className="shadow-2xl p-6 md:p-8 border-4 border-black bg-white"
-          style={{ boxShadow: `12px 12px 0 0 ${BRAND_COLOR}` }}
-        >
-          <CardHeader className="p-0 mb-6 border-b-2 border-black pb-4">
-            <CardTitle className="text-3xl md:text-4xl font-extrabold text-black">
+        {/* Profile Header */}
+        <Card className="shadow-md rounded-2xl border border-gray-200">
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold">
               {profileData.name}
             </CardTitle>
-            <CardDescription className="text-base md:text-lg text-gray-700 mt-2">
-              View and manage your account details, membership, and contact information.
+            <CardDescription>
+              Manage your personal information and membership details.
             </CardDescription>
           </CardHeader>
+        </Card>
 
-          <CardContent className="space-y-8 p-0 pt-4">
-            
-            <section>
-              <h3 className="text-xl md:text-2xl font-bold mb-4 text-black border-b-2 border-gray-300 pb-2">
-                Contact Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-center space-x-4 p-3 border-2 border-black" style={{ boxShadow: `3px 3px 0 0 ${BRAND_COLOR}` }}>
-                  <Mail className="w-6 h-6 flex-shrink-0" style={{ color: BRAND_COLOR }} />
+        {/* Contact Details */}
+        <Card className="shadow-md rounded-2xl border border-gray-200">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              Contact Information
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+
+            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+              <Mail className="w-5 h-5 text-gray-600" />
+              <div>
+                <p className="text-sm text-gray-500">Email</p>
+                <p className="font-medium text-gray-900">{profileData.email}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+              <Phone className="w-5 h-5 text-gray-600" />
+              <div>
+                <p className="text-sm text-gray-500">Phone</p>
+                <p className="font-medium text-gray-900">{profileData.phone}</p>
+              </div>
+            </div>
+
+          </CardContent>
+        </Card>
+
+        {/* Membership Section */}
+        <Card className="shadow-md rounded-2xl border border-gray-200">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              Membership Details
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-3">
+            {loadingMembership ? (
+              <p className="text-gray-600">Loading membership details...</p>
+            ) : membershipDetails ? (
+              <>
+
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                  <Package className="w-5 h-5 text-gray-600" />
                   <div>
-                    <p className="text-sm text-gray-600 font-medium">Email Address</p>
-                    <p className="font-bold text-black">{profileData.email}</p>
+                    <p className="text-sm text-gray-500">Current Plan</p>
+                    <p className="font-medium text-gray-900">
+                      {membershipDetails.plan_name}
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4 p-3 border-2 border-black" style={{ boxShadow: `3px 3px 0 0 ${BRAND_COLOR}` }}>
-                  <Phone className="w-6 h-6 flex-shrink-0" style={{ color: BRAND_COLOR }} />
+
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                  <CalendarDays className="w-5 h-5 text-gray-600" />
                   <div>
-                    <p className="text-sm text-gray-600 font-medium">Phone Number</p>
-                    <p className="font-bold text-black">{profileData.phone}</p>
+                    <p className="text-sm text-gray-500">Expires On</p>
+                    <p className="font-medium text-gray-900">
+                      {formatDate(membershipDetails.expiry_date)}
+                    </p>
                   </div>
                 </div>
-              </div>
-            </section>
 
-            <section>
-                <h3 className="text-xl md:text-2xl font-bold mb-4 text-black border-b-2 border-gray-300 pb-2">
-                    Membership Details
-                </h3>
-                {loadingMembership ? (
-                    <p className="text-gray-600">Loading membership details...</p>
-                ) : membershipDetails ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="flex items-center space-x-4 p-3 border-2 border-black" style={{ boxShadow: `3px 3px 0 0 ${ACCENT_COLOR_B}` }}>
-                            <Package className="w-6 h-6 flex-shrink-0" style={{ color: BRAND_COLOR }} />
-                            <div>
-                                <p className="text-sm text-gray-600 font-medium">Current Plan</p>
-                                <p className="font-bold text-black">{membershipDetails.plan_name || "No Active Plan"}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center space-x-4 p-3 border-2 border-black" style={{ boxShadow: `3px 3px 0 0 ${ACCENT_COLOR_B}` }}>
-                            <CalendarDays className="w-6 h-6 flex-shrink-0" style={{ color: BRAND_COLOR }} />
-                            <div>
-                                <p className="text-sm text-gray-600 font-medium">Expires On</p>
-                                <p className="font-bold text-black">{formatDate(membershipDetails.expiry_date) || "N/A"}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center space-x-4 p-3 border-2 border-black" style={{ boxShadow: `3px 3px 0 0 ${ACCENT_COLOR_B}` }}>
-                            <span className={`px-3 py-1 text-xs font-bold uppercase border-2 border-black
-                                ${membershipDetails.status === 'active' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}
-                                style={{ boxShadow: `2px 2px 0 0 ${ACCENT_COLOR_B}` }}
-                            >
-                                {membershipDetails.status || "N/A"}
-                            </span>
-                             <div className="leading-none">
-                                <p className="text-sm text-gray-600 font-medium">Membership Status</p>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <p className="text-gray-600">No active membership found.</p>
-                )}
-            </section>
-
-            <section>
-              <h3 className="text-xl md:text-2xl font-bold mb-4 text-black border-b-2 border-gray-300 pb-2">
-                Account History
-              </h3>
-              <div className="flex items-center space-x-4 p-3 border-2 border-black" style={{ boxShadow: `3px 3px 0 0 ${BRAND_COLOR}` }}>
-                <CalendarDays className="w-6 h-6 flex-shrink-0" style={{ color: BRAND_COLOR }} />
-                <div>
-                  <p className="text-sm text-gray-600 font-medium">Joined Gymie On</p>
-                  <p className="font-bold text-black">{profileData.joined}</p>
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                  <span
+                    className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                      membershipDetails.status === "active"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {membershipDetails.status}
+                  </span>
+                  <p className="text-gray-700 text-sm">Membership Status</p>
                 </div>
-              </div>
-            </section>
 
-            <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8 pt-4 border-t-2 border-black">
-              <Button
-                variant="outline"
-                className="w-full sm:w-auto text-base font-bold uppercase border-2 border-black"
-                style={{
-                  color: BRAND_COLOR,
-                  borderColor: BRAND_COLOR,
-                  boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
-                  backgroundColor: 'white',
-                }}
-                onClick={() => toast.info("Edit Profile functionality coming soon!")} 
-              >
-                Edit Profile
-              </Button>
-              <Button 
-                onClick={handleLogout} 
-                className="w-full sm:w-auto text-base font-bold uppercase transition-all duration-200"
-                style={{
-                    backgroundColor: BRAND_COLOR,
-                    color: 'white',
-                    border: `2px solid ${ACCENT_COLOR_B}`,
-                    boxShadow: `4px 4px 0 0 ${ACCENT_COLOR_B}`,
-                }}
-              >
-                <LogOut className="w-4 h-4 mr-2" /> Log Out
-              </Button>
+              </>
+            ) : (
+              <p className="text-gray-600">No active membership found.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Account History */}
+        <Card className="shadow-md rounded-2xl border border-gray-200">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              Account History
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+              <CalendarDays className="w-5 h-5 text-gray-600" />
+              <div>
+                <p className="text-sm text-gray-500">Joined Gymie On</p>
+                <p className="font-medium text-gray-900">{profileData.joined}</p>
+              </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
+
+          <Button
+            variant="outline"
+            className="border-gray-300 text-gray-800 hover:bg-gray-100"
+            onClick={() => {}}
+          >
+            Edit Profile
+          </Button>
+
+          <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={handleLogout}>
+            <LogOut className="w-4 h-4 mr-2" /> Log Out
+          </Button>
+
+        </div>
+
       </div>
     </div>
   );
